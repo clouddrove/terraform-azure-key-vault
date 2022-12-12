@@ -6,7 +6,7 @@
 
 
 # Name of this project
-name: Terraform AZURE KEY VAULT
+name: Terraform AZURE key-vault
 
 # License of this project
 license: "APACHE"
@@ -17,7 +17,7 @@ github_repo: clouddrove/terraform-azure-key-vault
 # Badges to display
 badges:
   - name: "Terraform"
-    image: "https://img.shields.io/badge/Terraform-v1.1.7-green"
+    image: "https://img.shields.io/badge/Terraform-v1.0.0-green"
     url: "https://www.terraform.io"
   - name: "Licence"
     image: "https://img.shields.io/badge/License-APACHE-blue.svg"
@@ -26,6 +26,7 @@ badges:
 #  description of this project
 description: |-
   Terraform module to create key-vault resource on AZURE.
+
 # extra content
 include:
   - "terraform.md"
