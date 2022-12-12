@@ -27,7 +27,7 @@ module "labels" {
 
 
 resource "azurerm_key_vault" "key_vault" {
-  name                        = format("kv-%s", module.labels.id)
+  name                        = format("%s-kv", module.labels.id)
   location                    = local.location
   resource_group_name         = local.resource_group_name
   enabled_for_disk_encryption = var.enabled_for_disk_encryption
