@@ -37,8 +37,8 @@ usage: |-
   ### Simple Example
   Here is an example of how you can use this module in your inventory structure:
   ```hcl
-  module "virtual-network" {
-   source                      = "clouddrove/virtual-network/azure"
+  module "key-vault" {
+   source                      = "clouddrove/key-vault/azure"
    name                        = "annkkdsovvdcc"
    environment                 = "test"
    label_order                 = ["name", "environment", ]
