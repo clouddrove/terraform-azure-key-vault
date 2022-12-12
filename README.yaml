@@ -38,67 +38,19 @@ usage: |-
   Here is an example of how you can use this module in your inventory structure:
   ```hcl
   module "virtual-network" {
-   source              = "clouddrove/key-vault/azure"
-    name        = "annkkdsovvdcc"
-    environment = "test"
-    label_order = ["name", "environment", ]
-    resource_group_name = module.resource_group.resource_group_name
-
-    purge_protection_enabled    = false
-    enabled_for_disk_encryption = true
-    sku_name = "standard"
-    subnet_id          = module.vnet.vnet_subnets[0]
-    virtual_network_id = module.vnet.vnet_id[0]
-    #private endpoint
-    enable_private_endpoint = true
-
-    #access_policy
-    access_policy = [
-      {
-        object_id = ""
-        key_permissions = [
-          "Get",
-          "List",
-          "Update",
-          "Create",
-          "Import",
-          "Delete",
-          "Recover",
-          "Backup",
-          "Restore",
-          "UnwrapKey",
-          "WrapKey",
-
-        ]
-        certificate_permissions = [
-          "Get",
-          "List",
-          "Update",
-          "Create",
-          "Import",
-          "Delete",
-          "Recover",
-          "Backup",
-          "Restore",
-          "ManageContacts",
-          "ManageIssuers",
-          "GetIssuers",
-          "ListIssuers",
-          "SetIssuers",
-          "DeleteIssuers"
-        ]
-        secret_permissions = [
-          "Get",
-          "List",
-          "Set",
-          "Delete",
-          "Recover",
-          "Backup",
-          "Restore"
-        ]
-        storage_permissions = []
-
-      }
-    ]
+   source                      = "clouddrove/virtual-network/azure"
+   name                        = "annkkdsovvdcc"
+   environment                 = "test"
+   label_order                 = ["name", "environment", ]
+   resource_group_name         = module.resource_group.resource_group_name
+   purge_protection_enabled    = false
+   enabled_for_disk_encryption = true
+   sku_name                    = "standard"
+   subnet_id                   = module.vnet.vnet_subnets[0]
+   virtual_network_id          = module.vnet.vnet_id[0]
+   #private endpoint
+   enable_private_endpoint     = true
+   #access_policy
+   access_policy               = [{}]
    }
     ```
