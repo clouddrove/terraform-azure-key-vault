@@ -50,7 +50,7 @@ resource "azurerm_key_vault" "key_vault" {
     }
   }
   dynamic "access_policy" {
-    for_each    = var.access_policy
+    for_each = var.access_policy
     content {
       tenant_id               = data.azurerm_client_config.current_client_config.tenant_id
       object_id               = access_policy.value.object_id

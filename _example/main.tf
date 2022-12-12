@@ -46,13 +46,13 @@ module "vnet" {
 
 #Key Vault
 module "vault" {
-  depends_on          = [module.resource_group, module.vnet]
-  source              = "./.."
+  depends_on = [module.resource_group, module.vnet]
+  source     = "./.."
 
-  label_order         = ["name", "environment", ]
+  name        = "annkkdsovvdcc"
+  environment = "test"
+  label_order = ["name", "environment", ]
 
-  name            = "annkkdsovvdcc"
-  environment         = "test"
   resource_group_name = module.resource_group.resource_group_name
 
   purge_protection_enabled    = false
@@ -60,59 +60,59 @@ module "vault" {
 
   sku_name = "standard"
 
-  subnet_id            = module.vnet.vnet_subnets[0]
-  virtual_network_id   = module.vnet.vnet_id[0]
+  subnet_id          = module.vnet.vnet_subnets[0]
+  virtual_network_id = module.vnet.vnet_id[0]
   #private endpoint
   enable_private_endpoint = true
 
   #access_policy
   access_policy = [
-  {
-    object_id = ""
-    key_permissions = [
-      "Get",
-      "List",
-      "Update",
-      "Create",
-      "Import",
-      "Delete",
-      "Recover",
-      "Backup",
-      "Restore",
-      "UnwrapKey",
-      "WrapKey",
+    {
+      object_id = ""
+      key_permissions = [
+        "Get",
+        "List",
+        "Update",
+        "Create",
+        "Import",
+        "Delete",
+        "Recover",
+        "Backup",
+        "Restore",
+        "UnwrapKey",
+        "WrapKey",
 
-    ]
-    certificate_permissions = [
-      "Get",
-      "List",
-      "Update",
-      "Create",
-      "Import",
-      "Delete",
-      "Recover",
-      "Backup",
-      "Restore",
-      "ManageContacts",
-      "ManageIssuers",
-      "GetIssuers",
-      "ListIssuers",
-      "SetIssuers",
-      "DeleteIssuers"
-    ]
-    secret_permissions = [
-      "Get",
-      "List",
-      "Set",
-      "Delete",
-      "Recover",
-      "Backup",
-      "Restore"
-    ]
-    storage_permissions = []
+      ]
+      certificate_permissions = [
+        "Get",
+        "List",
+        "Update",
+        "Create",
+        "Import",
+        "Delete",
+        "Recover",
+        "Backup",
+        "Restore",
+        "ManageContacts",
+        "ManageIssuers",
+        "GetIssuers",
+        "ListIssuers",
+        "SetIssuers",
+        "DeleteIssuers"
+      ]
+      secret_permissions = [
+        "Get",
+        "List",
+        "Set",
+        "Delete",
+        "Recover",
+        "Backup",
+        "Restore"
+      ]
+      storage_permissions = []
 
-  }
-]
+    }
+  ]
 
 }
 

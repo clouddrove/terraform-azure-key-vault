@@ -147,7 +147,7 @@ variable "virtual_network_id" {
 }
 
 variable "subnet_id" {
-  type = string
+  type        = string
   default     = ""
   description = "The resource ID of the subnet"
 }
