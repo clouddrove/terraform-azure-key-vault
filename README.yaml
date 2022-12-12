@@ -25,7 +25,7 @@ badges:
 
 #  description of this project
 description: |-
-  Terraform module to create STORAGE resource on AZURE.
+  Terraform module to create key-vault resource on AZURE.
 # extra content
 include:
   - "terraform.md"
@@ -73,7 +73,7 @@ usage: |-
     "UnwrapKey",
     "WrapKey",
 
-  ]
+    ]
     certificate_permissions = [
     "Get",
     "List",
@@ -106,4 +106,4 @@ usage: |-
     ]
 
     }
-     ```
+    ```
