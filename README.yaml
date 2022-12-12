@@ -38,7 +38,7 @@ usage: |-
   ```hcl
 
   module "storage" {
-  source      = "clouddrove/storage/key-vault"
+  source      = "clouddrove/key-vault/azure"
 
     name            = "annkkdsovvdcc"
     environment         = "test"
@@ -106,4 +106,4 @@ usage: |-
     ]
 
     }
-    ```
+     ```
