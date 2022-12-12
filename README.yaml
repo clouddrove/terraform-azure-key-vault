@@ -6,7 +6,7 @@
 
 
 # Name of this project
-name: Terraform AZURE key-vault
+name: Terraform AZURE KEY-VAULT
 
 # License of this project
 license: "APACHE"
@@ -37,7 +37,7 @@ usage: |-
   ### Simple Example
   Here is an example of how you can use this module in your inventory structure:
   ```hcl
-  module "key-vault" {
+  module "key_vault" {
    source                      = "clouddrove/key-vault/azure"
    name                        = "annkkdsovvdcc"
    environment                 = "test"
