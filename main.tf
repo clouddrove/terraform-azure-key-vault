@@ -10,6 +10,7 @@ data "azurerm_subscription" "primary" {
 
 locals {
   resource_group_name = data.azurerm_resource_group.default.name
+  resource_group_id   = data.azurerm_resource_group.default.id
   location            = data.azurerm_resource_group.default.location
 }
 
@@ -34,6 +35,7 @@ resource "azurerm_key_vault" "key_vault" {
   tenant_id                   = data.azurerm_client_config.current_client_config.tenant_id
   purge_protection_enabled    = var.purge_protection_enabled
   soft_delete_retention_days  = var.soft_delete_retention_days
+  enable_rbac_authorization   = var.enable_rbac_authorization
 
   sku_name = var.sku_name
   tags     = module.labels.tags
@@ -167,6 +169,14 @@ resource "azurerm_role_assignment" "aks_user_assigned" {
   principal_id         = join("", azurerm_user_assigned_identity.example.*.principal_id)
   scope                = join("", azurerm_key_vault.key_vault.*.id)
   role_definition_name = "Reader"
+}
+
+
+resource "azurerm_role_assignment" "rbac_user_assigned" {
+  count                = var.enabled && var.enable_rbac_authorization ? length(var.principal_id) : 0
+  principal_id         = element(var.principal_id, count.index)
+  scope                = join("", azurerm_key_vault.key_vault.*.id)
+  role_definition_name = element(var.role_definition_name, count.index)
 }
 
 resource "azurerm_key_vault_key" "example" {

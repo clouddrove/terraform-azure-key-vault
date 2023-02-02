@@ -157,3 +157,18 @@ variable "existing_private_dns_zone" {
   default     = null
   description = "Name of the existing private DNS zone"
 }
+variable "enable_rbac_authorization" {
+  type        = bool
+  default     = false
+  description = "(Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions."
+}
+variable "principal_id" {
+  type        = list(string)
+  default     = []
+  description = " The ID of the Principal (User, Group or Service Principal) to assign the Role Definition to. Changing this forces a new resource to be created."
+}
+variable "role_definition_name" {
+  type        = list(string)
+  default     = []
+  description = "The name of a built-in Role. Changing this forces a new resource to be created. Conflicts with role_definition_id"
+}

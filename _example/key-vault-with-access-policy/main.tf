@@ -47,7 +47,7 @@ module "vnet" {
 #Key Vault
 module "vault" {
   depends_on = [module.resource_group, module.vnet]
-  source     = "./.."
+  source     = "./../.."
 
   name        = "annkkdsovvdcc"
   environment = "test"
@@ -114,4 +114,3 @@ module "vault" {
     }
   ]
 }
-
