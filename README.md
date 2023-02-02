@@ -70,6 +70,7 @@ This module has a few dependencies:
 
 ### Simple Example
 Here is an example of how you can use this module in your inventory structure:
+  #### key-vault with access policy
 ```hcl
 module "key_vault" {
  source                      = "clouddrove/key-vault/azure"
@@ -88,6 +89,27 @@ module "key_vault" {
  access_policy               = [{}]
  }
   ```
+#### key-vault with RBAC
+  ```hcl
+module "key_vault" {
+ source                      = "clouddrove/key-vault/azure"
+ name                        = "annkkdsovvdcc"
+ environment                 = "test"
+ label_order                 = ["name", "environment", ]
+ resource_group_name         = module.resource_group.resource_group_name
+ purge_protection_enabled    = false
+ enabled_for_disk_encryption = true
+ sku_name                    = "standard"
+ subnet_id                   = module.vnet.vnet_subnets[0]
+ virtual_network_id          = module.vnet.vnet_id[0]
+ #private endpoint
+ enable_private_endpoint     = true
+ ##RBAC
+ enable_rbac_authorization   = true
+ principal_id                = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
+ role_definition_name        = ["Key Vault Administrator", ]
+ }
+  ```
 
 
 
@@ -101,6 +123,7 @@ module "key_vault" {
 | access\_policies | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
 | access\_policy | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
 | enable\_private\_endpoint | Manages a Private Endpoint to Azure database for MySQL | `bool` | `true` | no |
+| enable\_rbac\_authorization | (Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions. | `bool` | `false` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | enabled\_for\_disk\_encryption | Boolean flag to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. Defaults to false | `bool` | `null` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
@@ -112,9 +135,11 @@ module "key_vault" {
 | network\_acls\_default\_action | The Default Action to use when no rules match from ip\_rules / virtual\_network\_subnet\_ids. Possible values are Allow and Deny. | `string` | `"Deny"` | no |
 | network\_acls\_ip\_rules | (Optional) One or more IP Addresses, or CIDR Blocks which should be able to access the Key Vault. | `list(string)` | `null` | no |
 | network\_acls\_subnet\_ids | (Optional) One or more Subnet ID's which should be able to access this Key Vault. | `list(string)` | `null` | no |
+| principal\_id | The ID of the Principal (User, Group or Service Principal) to assign the Role Definition to. Changing this forces a new resource to be created. | `list(string)` | `[]` | no |
 | purge\_protection\_enabled | Is Purge Protection enabled for this Key Vault? Defaults to false | `bool` | `null` | no |
 | repository | Terraform current module repo | `string` | `""` | no |
 | resource\_group\_name | A container that holds related resources for an Azure solution | `string` | `""` | no |
+| role\_definition\_name | The name of a built-in Role. Changing this forces a new resource to be created. Conflicts with role\_definition\_id | `list(string)` | `[]` | no |
 | secrets | List of secrets for be created | `map` | `{}` | no |
 | sku\_name | The Name of the SKU used for this Key Vault. Possible values are standard and premium | `string` | `"standard"` | no |
 | soft\_delete\_retention\_days | The number of days that items should be retained for once soft-deleted. The valid value can be between 7 and 90 days | `number` | `90` | no |
