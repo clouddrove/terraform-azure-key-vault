@@ -7,7 +7,6 @@ data "azurerm_resource_group" "default" {
 data "azurerm_subscription" "primary" {
 }
 
-
 locals {
   resource_group_name = data.azurerm_resource_group.default.name
   resource_group_id   = data.azurerm_resource_group.default.id
@@ -26,7 +25,6 @@ module "labels" {
   repository  = var.repository
 }
 
-
 resource "azurerm_key_vault" "key_vault" {
   name                        = format("%s-kv", module.labels.id)
   location                    = local.location
@@ -36,10 +34,8 @@ resource "azurerm_key_vault" "key_vault" {
   purge_protection_enabled    = var.purge_protection_enabled
   soft_delete_retention_days  = var.soft_delete_retention_days
   enable_rbac_authorization   = var.enable_rbac_authorization
-
   sku_name = var.sku_name
   tags     = module.labels.tags
-
 
   dynamic "network_acls" {
     for_each = var.network_acls_bypass == null ? [] : ["acls"]
@@ -62,16 +58,11 @@ resource "azurerm_key_vault" "key_vault" {
       storage_permissions     = access_policy.value.storage_permissions
     }
   }
-
-
   lifecycle {
     ignore_changes = [
       tags,
     ]
   }
-
-
-
 }
 
 resource "azurerm_key_vault_secret" "key_vault_secret" {
@@ -79,21 +70,21 @@ resource "azurerm_key_vault_secret" "key_vault_secret" {
   key_vault_id = azurerm_key_vault.key_vault.id
   name         = each.key
   value        = each.value
-
 }
-
-
 
 resource "azurerm_private_endpoint" "pep" {
   count               = var.enable_private_endpoint ? 1 : 0
-  name                = format("pe-%s-kv", module.labels.id)
+  name                = format("%s-pe-kv", module.labels.id)
   location            = local.location
   resource_group_name = local.resource_group_name
   subnet_id           = var.subnet_id
   tags                = module.labels.tags
-
+  # private_dns_zone_group {
+  #   name                 = format("%s-kv", module.labels.id)
+  #   private_dns_zone_ids = var.existing_private_dns_zone == null ? azurerm_private_dns_zone.dnszone.*.id : data.azurerm_private_dns_zone.example.*.id
+  # }
   private_service_connection {
-    name                           = format("%s-kv-privatelink", module.labels.id)
+    name                           = format("%s-psc-kv", module.labels.id)
     is_manual_connection           = false
     private_connection_resource_id = join("", azurerm_key_vault.key_vault.*.id)
     subresource_names              = ["vault"]
@@ -106,21 +97,17 @@ resource "azurerm_private_endpoint" "pep" {
   }
 }
 
-
-
-resource "random_string" "str" {
-  count   = var.enable_private_endpoint ? 1 : 0
-  length  = 6
-  special = false
-  upper   = false
-}
-
-
 data "azurerm_private_endpoint_connection" "private-ip" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
   name                = join("", azurerm_private_endpoint.pep.*.name)
   resource_group_name = local.resource_group_name
   depends_on          = [azurerm_key_vault.key_vault]
+}
+
+data "azurerm_private_dns_zone" "example" {
+  count               = var.enabled && var.enable_private_endpoint ? 1 : 0
+  name                = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone.*.name) : var.existing_private_dns_zone
+  resource_group_name = local.resource_group_name
 }
 
 resource "azurerm_private_dns_zone" "dnszone" {
@@ -132,13 +119,12 @@ resource "azurerm_private_dns_zone" "dnszone" {
 
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
   count                 = var.enabled && var.enable_private_endpoint ? 1 : 0
-  name                  = "mydnslink"
+  name                  = format("%s-pdz-vnet-link-kv", module.labels.id)
   resource_group_name   = local.resource_group_name
   private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone.*.name) : var.existing_private_dns_zone
   virtual_network_id    = var.virtual_network_id
   tags                  = module.labels.tags
 }
-
 
 resource "azurerm_private_dns_a_record" "arecord" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
@@ -148,7 +134,6 @@ resource "azurerm_private_dns_a_record" "arecord" {
   ttl                 = 3600
   records             = [data.azurerm_private_endpoint_connection.private-ip.0.private_service_connection.0.private_ip_address]
   tags                = module.labels.tags
-
   lifecycle {
     ignore_changes = [
       tags,
