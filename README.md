@@ -122,12 +122,16 @@ module "key_vault" {
 |------|-------------|------|---------|:--------:|
 | access\_policies | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
 | access\_policy | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
+| addon\_resource\_group\_name | The name of the addon vnet resource group | `string` | `""` | no |
+| addon\_vent\_link | The name of the addon vnet | `bool` | `false` | no |
+| addon\_virtual\_network\_id | The name of the addon vnet link vnet id | `string` | `""` | no |
 | enable\_private\_endpoint | Manages a Private Endpoint to Azure database for MySQL | `bool` | `true` | no |
 | enable\_rbac\_authorization | (Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions. | `bool` | `false` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | enabled\_for\_disk\_encryption | Boolean flag to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. Defaults to false | `bool` | `null` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
 | existing\_private\_dns\_zone | Name of the existing private DNS zone | `string` | `null` | no |
+| existing\_private\_dns\_zone\_resource\_group\_name | The name of the existing resource group | `string` | `""` | no |
 | label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
 | managedby | ManagedBy, eg ''. | `string` | `""` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
@@ -136,6 +140,7 @@ module "key_vault" {
 | network\_acls\_ip\_rules | (Optional) One or more IP Addresses, or CIDR Blocks which should be able to access the Key Vault. | `list(string)` | `null` | no |
 | network\_acls\_subnet\_ids | (Optional) One or more Subnet ID's which should be able to access this Key Vault. | `list(string)` | `null` | no |
 | principal\_id | The ID of the Principal (User, Group or Service Principal) to assign the Role Definition to. Changing this forces a new resource to be created. | `list(string)` | `[]` | no |
+| public\_network\_access\_enabled | (Optional) Whether public network access is allowed for this Key Vault. Defaults to true | `bool` | `true` | no |
 | purge\_protection\_enabled | Is Purge Protection enabled for this Key Vault? Defaults to false | `bool` | `null` | no |
 | repository | Terraform current module repo | `string` | `""` | no |
 | resource\_group\_name | A container that holds related resources for an Azure solution | `string` | `""` | no |
