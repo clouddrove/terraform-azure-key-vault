@@ -112,7 +112,7 @@ data "azurerm_private_dns_zone" "example" {
 
 resource "azurerm_private_dns_zone" "dnszone" {
   count               = var.enabled && var.existing_private_dns_zone == null && var.enable_private_endpoint ? 1 : 0
-  name                = "privatelink.vaultcore.azure.com"
+  name                = "privatelink.vaultcore.azure.net"
   resource_group_name = local.resource_group_name
   tags                = module.labels.tags
 }
