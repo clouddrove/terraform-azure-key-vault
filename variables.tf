@@ -172,3 +172,34 @@ variable "role_definition_name" {
   default     = []
   description = "The name of a built-in Role. Changing this forces a new resource to be created. Conflicts with role_definition_id"
 }
+
+variable "existing_private_dns_zone_resource_group_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing resource group"
+}
+
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = true
+  description = "(Optional) Whether public network access is allowed for this Key Vault. Defaults to true"
+}
+
+## Addon vritual link
+variable "addon_vent_link" {
+  type        = bool
+  default     = false
+  description = "The name of the addon vnet "
+}
+
+variable "addon_resource_group_name" {
+  type        = string
+  default     = ""
+  description = "The name of the addon vnet resource group"
+}
+
+variable "addon_virtual_network_id" {
+  type        = string
+  default     = ""
+  description = "The name of the addon vnet link vnet id"
+}
