@@ -7,7 +7,7 @@ module "resource_group" {
   version = "1.0.1"
 
   label_order = ["name", "environment"]
-  name        = "rg"
+  name        = "rg-rbac"
   environment = "examplee"
   location    = "Canada Central"
 }
@@ -68,6 +68,11 @@ module "vault" {
   enable_rbac_authorization = true
   principal_id              = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
   role_definition_name      = ["Key Vault Administrator", ]
+
+  #### enable diagnostic setting
+  diagnostic_setting_enable  = false
+  log_analytics_workspace_id = ""
+
 
 }
 

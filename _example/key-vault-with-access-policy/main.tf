@@ -65,6 +65,10 @@ module "vault" {
   #private endpoint
   enable_private_endpoint = true
 
+  #### enable diagnostic setting
+  diagnostic_setting_enable  = false
+  log_analytics_workspace_id = ""
+
   #access_policy
   access_policy = [
     {
