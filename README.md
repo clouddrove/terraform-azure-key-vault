@@ -87,6 +87,10 @@ module "key_vault" {
  enable_private_endpoint     = true
  #access_policy
  access_policy               = [{}]
+
+ #### enable diagnostic setting
+ diagnostic_setting_enable  = false
+ log_analytics_workspace_id = ""
  }
   ```
 #### key-vault with RBAC
@@ -108,6 +112,10 @@ module "key_vault" {
  enable_rbac_authorization   = true
  principal_id                = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
  role_definition_name        = ["Key Vault Administrator", ]
+
+ #### enable diagnostic setting
+ diagnostic_setting_enable  = false
+ log_analytics_workspace_id = ""
  }
   ```
 
@@ -120,19 +128,28 @@ module "key_vault" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| Metric\_enable | Is this Diagnostic Metric enabled? Defaults to true. | `bool` | `true` | no |
 | access\_policies | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
 | access\_policy | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
 | addon\_resource\_group\_name | The name of the addon vnet resource group | `string` | `""` | no |
 | addon\_vent\_link | The name of the addon vnet | `bool` | `false` | no |
 | addon\_virtual\_network\_id | The name of the addon vnet link vnet id | `string` | `""` | no |
+| category | The name of a Diagnostic Log Category Group for this Resource. | `string` | `null` | no |
+| days | The number of days for which this Retention Policy should apply. | `number` | `"90"` | no |
+| diagnostic\_setting\_enable | n/a | `bool` | `false` | no |
 | enable\_private\_endpoint | Manages a Private Endpoint to Azure database for MySQL | `bool` | `true` | no |
 | enable\_rbac\_authorization | (Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions. | `bool` | `false` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | enabled\_for\_disk\_encryption | Boolean flag to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. Defaults to false | `bool` | `null` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
+| eventhub\_authorization\_rule\_id | Specifies the ID of an Event Hub Namespace Authorization Rule used to send Diagnostics Data. | `string` | `null` | no |
+| eventhub\_name | Specifies the name of the Event Hub where Diagnostics Data should be sent. | `string` | `null` | no |
 | existing\_private\_dns\_zone | Name of the existing private DNS zone | `string` | `null` | no |
 | existing\_private\_dns\_zone\_resource\_group\_name | The name of the existing resource group | `string` | `""` | no |
 | label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
+| log\_analytics\_destination\_type | Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table. | `string` | `"AzureDiagnostics"` | no |
+| log\_analytics\_workspace\_id | n/a | `string` | `null` | no |
+| log\_enabled | Is this Diagnostic Log enabled? Defaults to true. | `string` | `true` | no |
 | managedby | ManagedBy, eg ''. | `string` | `""` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
 | network\_acls\_bypass | Specifies which traffic can bypass the network rules. Possible values are AzureServices and None. | `string` | `null` | no |
@@ -144,10 +161,12 @@ module "key_vault" {
 | purge\_protection\_enabled | Is Purge Protection enabled for this Key Vault? Defaults to false | `bool` | `null` | no |
 | repository | Terraform current module repo | `string` | `""` | no |
 | resource\_group\_name | A container that holds related resources for an Azure solution | `string` | `""` | no |
+| retention\_policy\_enabled | Is this Retention Policy enabled? | `bool` | `false` | no |
 | role\_definition\_name | The name of a built-in Role. Changing this forces a new resource to be created. Conflicts with role\_definition\_id | `list(string)` | `[]` | no |
 | secrets | List of secrets for be created | `map` | `{}` | no |
 | sku\_name | The Name of the SKU used for this Key Vault. Possible values are standard and premium | `string` | `"standard"` | no |
 | soft\_delete\_retention\_days | The number of days that items should be retained for once soft-deleted. The valid value can be between 7 and 90 days | `number` | `90` | no |
+| storage\_account\_id | The ID of the Storage Account where logs should be sent. | `string` | `null` | no |
 | subnet\_id | The resource ID of the subnet | `string` | `""` | no |
 | tags | A map of tags to add to all resources | `map(string)` | `{}` | no |
 | virtual\_network\_id | The name of the virtual network | `string` | `""` | no |
