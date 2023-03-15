@@ -67,6 +67,7 @@ resource "azurerm_key_vault" "key_vault" {
 }
 
 resource "azurerm_key_vault_secret" "key_vault_secret" {
+  depends_on   = [azurerm_key_vault.key_vault, azurerm_role_assignment.rbac_user_assigned]
   for_each     = var.secrets
   key_vault_id = azurerm_key_vault.key_vault.id
   name         = each.key
@@ -180,6 +181,7 @@ resource "azurerm_role_assignment" "rbac_user_assigned" {
 }
 
 resource "azurerm_key_vault_key" "example" {
+  depends_on = [azurerm_key_vault.key_vault, azurerm_role_assignment.rbac_user_assigned]
   count        = var.enabled ? 1 : 0
   name         = format("mid-keyvault-%s", module.labels.id)
   key_vault_id = join("", azurerm_key_vault.key_vault.*.id)
