@@ -53,6 +53,10 @@ usage: |-
    enable_private_endpoint     = true
    #access_policy
    access_policy               = [{}]
+
+   #### enable diagnostic setting
+   diagnostic_setting_enable  = false
+   log_analytics_workspace_id = ""
    }
     ```
   #### key-vault with RBAC
@@ -74,5 +78,9 @@ usage: |-
    enable_rbac_authorization   = true
    principal_id                = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
    role_definition_name        = ["Key Vault Administrator", ]
+
+   #### enable diagnostic setting
+   diagnostic_setting_enable  = false
+   log_analytics_workspace_id = ""
    }
     ```
