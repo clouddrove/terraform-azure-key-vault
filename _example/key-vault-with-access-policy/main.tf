@@ -85,7 +85,7 @@ module "vault" {
         "Restore",
         "UnwrapKey",
         "WrapKey",
-
+        "GetRotationPolicy"
       ]
       certificate_permissions = [
         "Get",

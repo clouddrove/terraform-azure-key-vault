@@ -111,11 +111,11 @@ data "azurerm_private_endpoint_connection" "private-ip" {
   depends_on          = [azurerm_key_vault.key_vault]
 }
 
-data "azurerm_private_dns_zone" "example" {
-  count               = var.enabled && var.enable_private_endpoint ? 1 : 0
-  name                = local.private_dns_zone_name
-  resource_group_name = local.valid_rg_name
-}
+#data "azurerm_private_dns_zone" "example" {
+#  count               = var.enabled && var.enable_private_endpoint ? 1 : 0
+#  name                = local.private_dns_zone_name
+#  resource_group_name = local.valid_rg_name
+#}
 
 resource "azurerm_private_dns_zone" "dnszone" {
   count               = var.enabled && var.existing_private_dns_zone == null && var.enable_private_endpoint ? 1 : 0
@@ -181,7 +181,7 @@ resource "azurerm_role_assignment" "rbac_user_assigned" {
 }
 
 resource "azurerm_key_vault_key" "example" {
-  depends_on = [azurerm_key_vault.key_vault, azurerm_role_assignment.rbac_user_assigned]
+  depends_on   = [azurerm_key_vault.key_vault, ]
   count        = var.enabled ? 1 : 0
   name         = format("mid-keyvault-%s", module.labels.id)
   key_vault_id = join("", azurerm_key_vault.key_vault.*.id)
@@ -235,6 +235,29 @@ resource "azurerm_monitor_diagnostic_setting" "example" {
       days    = var.days
     }
     enabled = var.log_enabled
+  }
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "pe_kv_nic" {
+  depends_on                     = [azurerm_private_endpoint.pep]
+  count                          = var.enabled && var.diagnostic_setting_enable && var.enable_private_endpoint ? 1 : 0
+  name                           = format("%s-pe-kv-nic-diagnostic-log", module.labels.id)
+  target_resource_id             = element(azurerm_private_endpoint.pep[count.index].network_interface.*.id, count.index)
+  storage_account_id             = var.storage_account_id
+  eventhub_name                  = var.eventhub_name
+  eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
+  log_analytics_workspace_id     = var.log_analytics_workspace_id
+  log_analytics_destination_type = var.log_analytics_destination_type
+  metric {
+    category = "AllMetrics"
+    enabled  = var.Metric_enable
+    retention_policy {
+      enabled = var.retention_policy_enabled
+      days    = var.days
+    }
   }
   lifecycle {
     ignore_changes = [log_analytics_destination_type]
