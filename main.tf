@@ -26,17 +26,19 @@ module "labels" {
 }
 
 resource "azurerm_key_vault" "key_vault" {
-  name                          = format("%s-kv", module.labels.id)
-  location                      = local.location
-  resource_group_name           = local.resource_group_name
-  enabled_for_disk_encryption   = var.enabled_for_disk_encryption
-  tenant_id                     = data.azurerm_client_config.current_client_config.tenant_id
-  purge_protection_enabled      = var.purge_protection_enabled
-  soft_delete_retention_days    = var.soft_delete_retention_days
-  enable_rbac_authorization     = var.enable_rbac_authorization
-  public_network_access_enabled = var.public_network_access_enabled
-  sku_name                      = var.sku_name
-  tags                          = module.labels.tags
+  name                            = format("%s-kv", module.labels.id)
+  location                        = local.location
+  resource_group_name             = local.resource_group_name
+  enabled_for_disk_encryption     = var.enabled_for_disk_encryption
+  tenant_id                       = data.azurerm_client_config.current_client_config.tenant_id
+  purge_protection_enabled        = var.purge_protection_enabled
+  soft_delete_retention_days      = var.soft_delete_retention_days
+  enable_rbac_authorization       = var.enable_rbac_authorization
+  public_network_access_enabled   = var.public_network_access_enabled
+  sku_name                        = var.sku_name
+  enabled_for_deployment          = var.enabled_for_deployment
+  enabled_for_template_deployment = var.enabled_for_template_deployment
+  tags                            = module.labels.tags
 
   dynamic "network_acls" {
     for_each = var.network_acls_bypass == null ? [] : ["acls"]
@@ -59,6 +61,15 @@ resource "azurerm_key_vault" "key_vault" {
       storage_permissions     = access_policy.value.storage_permissions
     }
   }
+  dynamic "contact" {
+    for_each = var.certificate_contacts
+    content {
+      email = contact.value.email
+      name  = contact.value.name
+      phone = contact.value.phone
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       tags,
@@ -72,6 +83,7 @@ resource "azurerm_key_vault_secret" "key_vault_secret" {
   key_vault_id = azurerm_key_vault.key_vault.id
   name         = each.key
   value        = each.value
+  tags         = module.labels.tags
 }
 
 resource "azurerm_private_endpoint" "pep" {
@@ -162,6 +174,7 @@ resource "azurerm_user_assigned_identity" "example" {
   resource_group_name = local.resource_group_name
   location            = local.location
   name                = format("midd-keyvault-%s", module.labels.id)
+  tags                = module.labels.tags
 }
 
 
@@ -198,6 +211,7 @@ resource "azurerm_key_vault_key" "example" {
     "verify",
     "wrapKey",
   ]
+  tags = module.labels.tags
 }
 
 resource "azurerm_monitor_diagnostic_setting" "example" {
