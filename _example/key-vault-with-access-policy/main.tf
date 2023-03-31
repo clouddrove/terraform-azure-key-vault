@@ -46,14 +46,14 @@ module "vnet" {
 
 #Key Vault
 module "vault" {
-  depends_on = [module.resource_group, module.vnet]
-  source     = "./../.."
+  source = "./../.."
 
   name        = "annkkdsovvdcc"
   environment = "test"
   label_order = ["name", "environment", ]
 
   resource_group_name = module.resource_group.resource_group_name
+  location            = module.resource_group.resource_group_location
 
   purge_protection_enabled    = false
   enabled_for_disk_encryption = true
@@ -64,6 +64,16 @@ module "vault" {
   virtual_network_id = module.vnet.vnet_id[0]
   #private endpoint
   enable_private_endpoint = true
+  ########Following to be uncommnented only when using DNS Zone from different subscription along with existing DNS zone.
+
+  # diff_sub                                      = true
+  # alias                                         = ""
+  # alias_sub                                     = ""
+
+  #########Following to be uncommmented when using DNS zone from different resource group or different subscription.
+
+  # existing_private_dns_zone                     = ""
+  # existing_private_dns_zone_resource_group_name = ""
 
   #### enable diagnostic setting
   diagnostic_setting_enable  = false

@@ -1,17 +1,5 @@
 data "azurerm_client_config" "current_client_config" {}
 
-data "azurerm_resource_group" "default" {
-  name = var.resource_group_name
-}
-
-data "azurerm_subscription" "primary" {
-}
-
-locals {
-  resource_group_name = data.azurerm_resource_group.default.name
-  resource_group_id   = data.azurerm_resource_group.default.id
-  location            = data.azurerm_resource_group.default.location
-}
 
 module "labels" {
 
@@ -27,8 +15,8 @@ module "labels" {
 
 resource "azurerm_key_vault" "key_vault" {
   name                          = format("%s-kv", module.labels.id)
-  location                      = local.location
-  resource_group_name           = local.resource_group_name
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
   enabled_for_disk_encryption   = var.enabled_for_disk_encryption
   tenant_id                     = data.azurerm_client_config.current_client_config.tenant_id
   purge_protection_enabled      = var.purge_protection_enabled
@@ -74,11 +62,17 @@ resource "azurerm_key_vault_secret" "key_vault_secret" {
   value        = each.value
 }
 
+provider "azurerm" {
+  alias = "peer"
+  features {}
+  subscription_id = var.alias_sub
+}
+
 resource "azurerm_private_endpoint" "pep" {
   count               = var.enable_private_endpoint ? 1 : 0
   name                = format("%s-pe-kv", module.labels.id)
-  location            = local.location
-  resource_group_name = local.resource_group_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
   subnet_id           = var.subnet_id
   tags                = module.labels.tags
   # private_dns_zone_group {
@@ -100,14 +94,14 @@ resource "azurerm_private_endpoint" "pep" {
 }
 
 locals {
-  valid_rg_name         = var.existing_private_dns_zone == null ? local.resource_group_name : var.existing_private_dns_zone_resource_group_name
+  valid_rg_name         = var.existing_private_dns_zone == null ? var.resource_group_name : var.existing_private_dns_zone_resource_group_name
   private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone.*.name) : var.existing_private_dns_zone
 }
 
 data "azurerm_private_endpoint_connection" "private-ip" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
   name                = join("", azurerm_private_endpoint.pep.*.name)
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
   depends_on          = [azurerm_key_vault.key_vault]
 }
 
@@ -120,12 +114,22 @@ data "azurerm_private_endpoint_connection" "private-ip" {
 resource "azurerm_private_dns_zone" "dnszone" {
   count               = var.enabled && var.existing_private_dns_zone == null && var.enable_private_endpoint ? 1 : 0
   name                = "privatelink.vaultcore.azure.net"
-  resource_group_name = local.resource_group_name
+  resource_group_name = var.resource_group_name
   tags                = module.labels.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
-  count                 = var.enabled && var.enable_private_endpoint ? 1 : 0
+  count                 = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
+  name                  = var.existing_private_dns_zone == null ? format("%s-pdz-vnet-link-kv", module.labels.id) : format("%s-pdz-vnet-link-kv-1", module.labels.id)
+  resource_group_name   = local.valid_rg_name
+  private_dns_zone_name = local.private_dns_zone_name
+  virtual_network_id    = var.virtual_network_id
+  tags                  = module.labels.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
+  provider              = azurerm.peer
+  count                 = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
   name                  = var.existing_private_dns_zone == null ? format("%s-pdz-vnet-link-kv", module.labels.id) : format("%s-pdz-vnet-link-kv-1", module.labels.id)
   resource_group_name   = local.valid_rg_name
   private_dns_zone_name = local.private_dns_zone_name
@@ -143,7 +147,23 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
 }
 
 resource "azurerm_private_dns_a_record" "arecord" {
-  count               = var.enabled && var.enable_private_endpoint ? 1 : 0
+  count               = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
+  name                = join("", azurerm_key_vault.key_vault.*.name)
+  zone_name           = local.private_dns_zone_name
+  resource_group_name = local.valid_rg_name
+  ttl                 = 3600
+  records             = [data.azurerm_private_endpoint_connection.private-ip.0.private_service_connection.0.private_ip_address]
+  tags                = module.labels.tags
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
+}
+
+resource "azurerm_private_dns_a_record" "arecord-1" {
+  count               = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
+  provider            = azurerm.peer
   name                = join("", azurerm_key_vault.key_vault.*.name)
   zone_name           = local.private_dns_zone_name
   resource_group_name = local.valid_rg_name
@@ -159,8 +179,8 @@ resource "azurerm_private_dns_a_record" "arecord" {
 
 resource "azurerm_user_assigned_identity" "example" {
   count               = var.enabled ? 1 : 0
-  resource_group_name = local.resource_group_name
-  location            = local.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
   name                = format("midd-keyvault-%s", module.labels.id)
 }
 
