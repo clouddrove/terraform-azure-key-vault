@@ -134,9 +134,12 @@ module "key_vault" {
 | addon\_resource\_group\_name | The name of the addon vnet resource group | `string` | `""` | no |
 | addon\_vent\_link | The name of the addon vnet | `bool` | `false` | no |
 | addon\_virtual\_network\_id | The name of the addon vnet link vnet id | `string` | `""` | no |
+| alias | Alias for local provider in module. | `string` | `null` | no |
+| alias\_sub | Different subscription id for local provider(id of diff sub in which DNS zone is present). | `string` | `null` | no |
 | category | The name of a Diagnostic Log Category Group for this Resource. | `string` | `null` | no |
 | days | The number of days for which this Retention Policy should apply. | `number` | `"90"` | no |
 | diagnostic\_setting\_enable | n/a | `bool` | `false` | no |
+| diff\_sub | Flag to tell whether dns zone is in different sub or not. | `bool` | `false` | no |
 | enable\_private\_endpoint | Manages a Private Endpoint to Azure database for MySQL | `bool` | `true` | no |
 | enable\_rbac\_authorization | (Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions. | `bool` | `false` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
@@ -147,6 +150,7 @@ module "key_vault" {
 | existing\_private\_dns\_zone | Name of the existing private DNS zone | `string` | `null` | no |
 | existing\_private\_dns\_zone\_resource\_group\_name | The name of the existing resource group | `string` | `""` | no |
 | label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
+| location | Location where resource group will be created. | `string` | `null` | no |
 | log\_analytics\_destination\_type | Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table. | `string` | `"AzureDiagnostics"` | no |
 | log\_analytics\_workspace\_id | n/a | `string` | `null` | no |
 | log\_enabled | Is this Diagnostic Log enabled? Defaults to true. | `string` | `true` | no |
