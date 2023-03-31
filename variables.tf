@@ -64,13 +64,13 @@ variable "sku_name" {
 
 variable "enabled_for_disk_encryption" {
   type        = bool
-  default     = null
+  default     = true
   description = "Boolean flag to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. Defaults to false"
 }
 
 variable "purge_protection_enabled" {
   type        = bool
-  default     = null
+  default     = true
   description = "Is Purge Protection enabled for this Key Vault? Defaults to false"
 }
 
@@ -109,6 +109,26 @@ variable "soft_delete_retention_days" {
   description = "The number of days that items should be retained for once soft-deleted. The valid value can be between 7 and 90 days"
 
 }
+variable "enabled_for_deployment" {
+  type        = bool
+  default     = false
+  description = "Boolean flag to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault."
+}
+variable "enabled_for_template_deployment" {
+  type        = bool
+  default     = false
+  description = " Boolean flag to specify whether Azure Resource Manager is permitted to retrieve secrets from the key vault."
+}
+variable "certificate_contacts" {
+  type = list(object({
+    email = string
+    name  = optional(string)
+    phone = optional(string)
+  }))
+  default     = []
+  description = "Contact information to send notifications triggered by certificate lifetime events"
+}
+
 variable "access_policies" {
   type = list(object({
     object_id               = string,
@@ -165,7 +185,7 @@ variable "existing_private_dns_zone" {
 }
 variable "enable_rbac_authorization" {
   type        = bool
-  default     = false
+  default     = true
   description = "(Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions."
 }
 variable "principal_id" {

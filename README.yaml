@@ -43,14 +43,11 @@ usage: |-
    name                        = "annkkdsovvdcc"
    environment                 = "test"
    label_order                 = ["name", "environment", ]
+
    resource_group_name         = module.resource_group.resource_group_name
-   purge_protection_enabled    = false
-   enabled_for_disk_encryption = true
-   sku_name                    = "standard"
-   subnet_id                   = module.vnet.vnet_subnets[0]
+
    virtual_network_id          = module.vnet.vnet_id[0]
-   #private endpoint
-   enable_private_endpoint     = true
+   subnet_id                   = module.subnet.default_subnet_id[0]
    #access_policy
    access_policy               = [{}]
 
@@ -62,22 +59,19 @@ usage: |-
   #### key-vault with RBAC
     ```hcl
   module "key_vault" {
-   source                      = "clouddrove/key-vault/azure"
-   name                        = "annkkdsovvdcc"
-   environment                 = "test"
-   label_order                 = ["name", "environment", ]
-   resource_group_name         = module.resource_group.resource_group_name
-   purge_protection_enabled    = false
-   enabled_for_disk_encryption = true
-   sku_name                    = "standard"
-   subnet_id                   = module.vnet.vnet_subnets[0]
-   virtual_network_id          = module.vnet.vnet_id[0]
-   #private endpoint
-   enable_private_endpoint     = true
+   source                  = "clouddrove/key-vault/azure"
+   name                    = "annkkdsovvdcc"
+   environment             = "test"
+   label_order             = ["name", "environment", ]
+
+   resource_group_name     = module.resource_group.resource_group_name
+
+   virtual_network_id      = module.vnet.vnet_id[0]
+   subnet_id               = module.subnet.default_subnet_id[0]
    ##RBAC
-   enable_rbac_authorization   = true
-   principal_id                = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
-   role_definition_name        = ["Key Vault Administrator", ]
+   enable_rbac_authorization = true
+   principal_id              = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
+   role_definition_name      = ["Key Vault Administrator", ]
 
    #### enable diagnostic setting
    diagnostic_setting_enable  = false
