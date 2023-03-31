@@ -77,14 +77,11 @@ module "key_vault" {
  name                        = "annkkdsovvdcc"
  environment                 = "test"
  label_order                 = ["name", "environment", ]
+
  resource_group_name         = module.resource_group.resource_group_name
- purge_protection_enabled    = false
- enabled_for_disk_encryption = true
- sku_name                    = "standard"
- subnet_id                   = module.vnet.vnet_subnets[0]
+
  virtual_network_id          = module.vnet.vnet_id[0]
- #private endpoint
- enable_private_endpoint     = true
+ subnet_id                   = module.subnet.default_subnet_id[0]
  #access_policy
  access_policy               = [{}]
 
@@ -96,22 +93,19 @@ module "key_vault" {
 #### key-vault with RBAC
   ```hcl
 module "key_vault" {
- source                      = "clouddrove/key-vault/azure"
- name                        = "annkkdsovvdcc"
- environment                 = "test"
- label_order                 = ["name", "environment", ]
- resource_group_name         = module.resource_group.resource_group_name
- purge_protection_enabled    = false
- enabled_for_disk_encryption = true
- sku_name                    = "standard"
- subnet_id                   = module.vnet.vnet_subnets[0]
- virtual_network_id          = module.vnet.vnet_id[0]
- #private endpoint
- enable_private_endpoint     = true
+ source                  = "clouddrove/key-vault/azure"
+ name                    = "annkkdsovvdcc"
+ environment             = "test"
+ label_order             = ["name", "environment", ]
+
+ resource_group_name     = module.resource_group.resource_group_name
+
+ virtual_network_id      = module.vnet.vnet_id[0]
+ subnet_id               = module.subnet.default_subnet_id[0]
  ##RBAC
- enable_rbac_authorization   = true
- principal_id                = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
- role_definition_name        = ["Key Vault Administrator", ]
+ enable_rbac_authorization = true
+ principal_id              = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
+ role_definition_name      = ["Key Vault Administrator", ]
 
  #### enable diagnostic setting
  diagnostic_setting_enable  = false
@@ -137,13 +131,16 @@ module "key_vault" {
 | alias | Alias for local provider in module. | `string` | `null` | no |
 | alias\_sub | Different subscription id for local provider(id of diff sub in which DNS zone is present). | `string` | `null` | no |
 | category | The name of a Diagnostic Log Category Group for this Resource. | `string` | `null` | no |
+| certificate\_contacts | Contact information to send notifications triggered by certificate lifetime events | <pre>list(object({<br>    email = string<br>    name  = optional(string)<br>    phone = optional(string)<br>  }))</pre> | `[]` | no |
 | days | The number of days for which this Retention Policy should apply. | `number` | `"90"` | no |
 | diagnostic\_setting\_enable | n/a | `bool` | `false` | no |
 | diff\_sub | Flag to tell whether dns zone is in different sub or not. | `bool` | `false` | no |
 | enable\_private\_endpoint | Manages a Private Endpoint to Azure database for MySQL | `bool` | `true` | no |
-| enable\_rbac\_authorization | (Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions. | `bool` | `false` | no |
+| enable\_rbac\_authorization | (Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions. | `bool` | `true` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
-| enabled\_for\_disk\_encryption | Boolean flag to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. Defaults to false | `bool` | `null` | no |
+| enabled\_for\_deployment | Boolean flag to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault. | `bool` | `false` | no |
+| enabled\_for\_disk\_encryption | Boolean flag to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. Defaults to false | `bool` | `true` | no |
+| enabled\_for\_template\_deployment | Boolean flag to specify whether Azure Resource Manager is permitted to retrieve secrets from the key vault. | `bool` | `false` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
 | eventhub\_authorization\_rule\_id | Specifies the ID of an Event Hub Namespace Authorization Rule used to send Diagnostics Data. | `string` | `null` | no |
 | eventhub\_name | Specifies the name of the Event Hub where Diagnostics Data should be sent. | `string` | `null` | no |
@@ -162,7 +159,7 @@ module "key_vault" {
 | network\_acls\_subnet\_ids | (Optional) One or more Subnet ID's which should be able to access this Key Vault. | `list(string)` | `null` | no |
 | principal\_id | The ID of the Principal (User, Group or Service Principal) to assign the Role Definition to. Changing this forces a new resource to be created. | `list(string)` | `[]` | no |
 | public\_network\_access\_enabled | (Optional) Whether public network access is allowed for this Key Vault. Defaults to true | `bool` | `true` | no |
-| purge\_protection\_enabled | Is Purge Protection enabled for this Key Vault? Defaults to false | `bool` | `null` | no |
+| purge\_protection\_enabled | Is Purge Protection enabled for this Key Vault? Defaults to false | `bool` | `true` | no |
 | repository | Terraform current module repo | `string` | `""` | no |
 | resource\_group\_name | A container that holds related resources for an Azure solution | `string` | `""` | no |
 | retention\_policy\_enabled | Is this Retention Policy enabled? | `bool` | `false` | no |
