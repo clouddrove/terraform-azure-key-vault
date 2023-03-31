@@ -43,6 +43,12 @@ variable "resource_group_name" {
 
 }
 
+variable "location" {
+  type        = string
+  default     = null
+  description = "Location where resource group will be created."
+}
+
 
 variable "tags" {
   type        = map(string)
@@ -179,7 +185,7 @@ variable "existing_private_dns_zone" {
 }
 variable "enable_rbac_authorization" {
   type        = bool
-  default     = false
+  default     = true
   description = "(Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions."
 }
 variable "principal_id" {
@@ -277,4 +283,25 @@ variable "eventhub_authorization_rule_id" {
   type        = string
   default     = null
   description = "Specifies the ID of an Event Hub Namespace Authorization Rule used to send Diagnostics Data."
+}
+
+variable "diff_sub" {
+  # To be set true when hosted DNS zone is in different subnscription.
+  type        = bool
+  default     = false
+  description = "Flag to tell whether dns zone is in different sub or not."
+}
+
+variable "alias" {
+  # To be set when you are using a DNS zone from different subscription.
+  type        = string
+  default     = null
+  description = "Alias for local provider in module."
+}
+
+variable "alias_sub" {
+  # To be set when you are using a DNS zone from different subscription.
+  type        = string
+  default     = null
+  description = "Different subscription id for local provider(id of diff sub in which DNS zone is present)."
 }

@@ -12,7 +12,6 @@ module "resource_group" {
   location    = "Canada Central"
 }
 
-
 #Vnet
 module "vnet" {
   source  = "clouddrove/vnet/azure"
@@ -68,17 +67,21 @@ module "log-analytics" {
 
 #Key Vault
 module "vault" {
-  depends_on = [module.resource_group, module.vnet]
-  source     = "./../.."
 
-  name        = "annkkdsovvdcc"
+  source = "./../.."
+
+  name        = "an13xvvdcc"
   environment = "test"
   label_order = ["name", "environment", ]
 
   resource_group_name = module.resource_group.resource_group_name
+  location            = module.resource_group.resource_group_location
 
   virtual_network_id = module.vnet.vnet_id[0]
   subnet_id          = module.subnet.default_subnet_id[0]
+  #private endpoint
+  enable_private_endpoint = true
+
   ##RBAC
   enable_rbac_authorization = true
   principal_id              = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
@@ -88,5 +91,15 @@ module "vault" {
   diagnostic_setting_enable  = true
   log_analytics_workspace_id = module.log-analytics.workspace_id ## when diagnostic_setting_enable enable,  add log analytics workspace id
 
+
+  ########Following to be uncommnented only when using DNS Zone from different subscription along with existing DNS zone.
+
+  # diff_sub                                      = true
+  # alias                                         = ""
+  # alias_sub                                     = ""
+
+  #########Following to be uncommmented when using DNS zone from different resource group or different subscription.
+  # existing_private_dns_zone                     = ""
+  # existing_private_dns_zone_resource_group_name = ""
 }
 
