@@ -152,7 +152,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
 
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
   provider              = azurerm.peer
-  count                 = var.multi_sub_vnet_link && var.existing_private_dns_zone != null && var.diff_sub == true ? 1 : 0
+  count                 = var.multi_sub_vnet_link && var.existing_private_dns_zone != null ? 1 : 0
   name                  = format("%s-pdz-vnet-link-kv-1", module.labels.id)
   resource_group_name   = var.existing_private_dns_zone_resource_group_name
   private_dns_zone_name = var.existing_private_dns_zone
