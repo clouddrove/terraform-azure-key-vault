@@ -152,6 +152,7 @@ module "key_vault" {
 | log\_analytics\_workspace\_id | n/a | `string` | `null` | no |
 | log\_enabled | Is this Diagnostic Log enabled? Defaults to true. | `string` | `true` | no |
 | managedby | ManagedBy, eg ''. | `string` | `""` | no |
+| multi\_sub\_vnet\_link | Flag to control creation of vnet link for dns zone in different subscription | `bool` | `false` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
 | network\_acls\_bypass | Specifies which traffic can bypass the network rules. Possible values are AzureServices and None. | `string` | `null` | no |
 | network\_acls\_default\_action | The Default Action to use when no rules match from ip\_rules / virtual\_network\_subnet\_ids. Possible values are Allow and Deny. | `string` | `"Deny"` | no |
