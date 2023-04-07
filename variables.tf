@@ -305,3 +305,10 @@ variable "alias_sub" {
   default     = null
   description = "Different subscription id for local provider(id of diff sub in which DNS zone is present)."
 }
+
+variable "multi_sub_vnet_link" {
+  type        = bool
+  default     = false
+  description = "Flag to control creation of vnet link for dns zone in different subscription"
+}
+

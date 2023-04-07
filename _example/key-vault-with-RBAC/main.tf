@@ -4,15 +4,14 @@ provider "azurerm" {
 
 module "resource_group" {
   source  = "clouddrove/resource-group/azure"
-  version = "1.0.1"
+  version = "1.0.2"
 
-  label_order = ["name", "environment"]
-  name        = "rg-rbac"
-  environment = "examplee"
+  name        = "app"
+  environment = "test"
+  label_order = ["environment", "name", ]
   location    = "Canada Central"
 }
 
-#Vnet
 module "vnet" {
   source  = "clouddrove/vnet/azure"
   version = "1.0.1"
@@ -22,13 +21,12 @@ module "vnet" {
   label_order         = ["name", "environment"]
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
-  address_space       = "10.0.0.0/16"
+  address_space       = "10.30.0.0/16"
 }
 
-###subnet
 module "subnet" {
   source  = "clouddrove/subnet/azure"
-  version = "1.0.1"
+  version = "1.0.2"
 
   name                 = "app"
   environment          = "test"
@@ -38,12 +36,10 @@ module "subnet" {
   virtual_network_name = join("", module.vnet.vnet_name)
 
   #subnet
-  default_name_subnet = true
-  subnet_names        = ["subnet1"]
-  subnet_prefixes     = ["10.0.1.0/24"]
+  subnet_names    = ["subnet1", "subnet2"]
+  subnet_prefixes = ["10.30.1.0/24", "10.30.2.0/24"]
 
   # route_table
-  enable_route_table = false
   routes = [
     {
       name           = "rt-test"
@@ -70,7 +66,7 @@ module "vault" {
 
   source = "./../.."
 
-  name        = "an13xvvdcc"
+  name        = "anfdcc"
   environment = "test"
   label_order = ["name", "environment", ]
 
@@ -79,8 +75,6 @@ module "vault" {
 
   virtual_network_id = module.vnet.vnet_id[0]
   subnet_id          = module.subnet.default_subnet_id[0]
-  #private endpoint
-  enable_private_endpoint = true
 
   ##RBAC
   enable_rbac_authorization = true
@@ -102,4 +96,3 @@ module "vault" {
   # existing_private_dns_zone                     = ""
   # existing_private_dns_zone_resource_group_name = ""
 }
-
