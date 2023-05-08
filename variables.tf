@@ -312,3 +312,8 @@ variable "multi_sub_vnet_link" {
   description = "Flag to control creation of vnet link for dns zone in different subscription"
 }
 
+variable "key_enabled" {
+  type        = bool
+  default     = false
+  description = "Flag to control creation of key vault key resource."
+}
