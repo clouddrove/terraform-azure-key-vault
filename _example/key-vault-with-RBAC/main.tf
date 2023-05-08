@@ -64,7 +64,7 @@ module "log-analytics" {
 #Key Vault
 module "vault" {
 
-  source = "./../.."
+  source = "clouddrove/key-vault/azure"
 
   name        = "anfdcc"
   environment = "test"
