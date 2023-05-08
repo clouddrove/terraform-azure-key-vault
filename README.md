@@ -146,6 +146,7 @@ module "key_vault" {
 | eventhub\_name | Specifies the name of the Event Hub where Diagnostics Data should be sent. | `string` | `null` | no |
 | existing\_private\_dns\_zone | Name of the existing private DNS zone | `string` | `null` | no |
 | existing\_private\_dns\_zone\_resource\_group\_name | The name of the existing resource group | `string` | `""` | no |
+| key\_enabled | Flag to control creation of key vault key resource. | `bool` | `false` | no |
 | label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
 | location | Location where resource group will be created. | `string` | `null` | no |
 | log\_analytics\_destination\_type | Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table. | `string` | `"AzureDiagnostics"` | no |
