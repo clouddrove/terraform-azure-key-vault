@@ -153,7 +153,17 @@ variable "access_policy" {
   description = "Map of access policies for an object_id (user, service principal, security group) to backend."
 }
 
+variable "admin_objects_ids" {
+  description = "IDs of the objects that can do all operations on all keys, secrets and certificates."
+  type        = list(string)
+  default     = []
+}
 
+variable "reader_objects_ids" {
+  description = "IDs of the objects that can read all keys, secrets and certificates."
+  type        = list(string)
+  default     = []
+}
 
 variable "enable_private_endpoint" {
   type        = bool
@@ -235,21 +245,51 @@ variable "log_analytics_destination_type" {
   default     = "AzureDiagnostics"
   description = "Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table."
 }
+
 variable "retention_policy_enabled" {
   type        = bool
   default     = false
   description = "Is this Retention Policy enabled?"
 }
+
 variable "days" {
   type        = number
   default     = "90"
   description = " The number of days for which this Retention Policy should apply."
 }
-variable "Metric_enable" {
+
+variable "metric_enabled" {
   type        = bool
   default     = true
   description = "Is this Diagnostic Metric enabled? Defaults to true."
 }
+
+variable "kv_logs" {
+  type = object({
+    enabled        = bool
+    category       = optional(list(string))
+    category_group = optional(list(string))
+  })
+
+  default = {
+    enabled        = true
+    category_group = ["AllLogs"]
+  }
+}
+
+variable "kv_nic_logs" {
+  type = object({
+    enabled        = bool
+    category       = optional(list(string))
+    category_group = optional(list(string))
+  })
+
+  default = {
+    enabled        = true
+    category_group = ["AllLogs"]
+  }
+}
+
 variable "diagnostic_setting_enable" {
   type    = bool
   default = false
@@ -316,4 +356,10 @@ variable "key_enabled" {
   type        = bool
   default     = false
   description = "Flag to control creation of key vault key resource."
+}
+
+variable "managed_hardware_security_module_enabled" {
+  description = "Create a KeyVault Managed HSM resource if enabled. Changing this forces a new resource to be created."
+  type        = bool
+  default     = false
 }
