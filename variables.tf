@@ -286,7 +286,7 @@ variable "kv_nic_logs" {
 
   default = {
     enabled        = true
-    category_group = ["AllLogs"]
+    category_group = [""]
   }
 }
 

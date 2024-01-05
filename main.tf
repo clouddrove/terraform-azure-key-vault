@@ -379,13 +379,6 @@ resource "azurerm_monitor_diagnostic_setting" "pe_kv_nic" {
       enabled  = true
     }
   }
-  dynamic "enabled_log" {
-    for_each = var.kv_nic_logs.enabled ? var.kv_nic_logs.category != null ? var.kv_nic_logs.category : var.kv_nic_logs.category_group : []
-    content {
-      category       = var.kv_nic_logs.category != null ? enabled_log.value : null
-      category_group = var.kv_nic_logs.category == null ? enabled_log.value : null
-    }
-  }
   lifecycle {
     ignore_changes = [log_analytics_destination_type]
   }
