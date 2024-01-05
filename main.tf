@@ -8,7 +8,7 @@ data "azurerm_client_config" "current_client_config" {}
 ##-----------------------------------------------------------------------------
 locals {
   valid_rg_name         = var.existing_private_dns_zone == null ? var.resource_group_name : var.existing_private_dns_zone_resource_group_name
-  private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone.*.name) : var.existing_private_dns_zone
+  private_dns_zone_name = var.existing_private_dns_zone == null ? azurerm_private_dns_zone.dnszone[0].name : var.existing_private_dns_zone
 }
 
 ##-----------------------------------------------------------------------------
@@ -80,7 +80,7 @@ resource "azurerm_key_vault_access_policy" "readers_policy" {
 
   object_id    = each.value
   tenant_id    = data.azurerm_client_config.current_client_config.tenant_id
-  key_vault_id = join("", azurerm_key_vault.key_vault.*.id)
+  key_vault_id = azurerm_key_vault.key_vault[0].id
 
   key_permissions = [
     "Get",
@@ -103,7 +103,7 @@ resource "azurerm_key_vault_access_policy" "admin_policy" {
 
   object_id    = each.value
   tenant_id    = data.azurerm_client_config.current_client_config.tenant_id
-  key_vault_id = join("", azurerm_key_vault.key_vault.*.id)
+  key_vault_id = azurerm_key_vault.key_vault[0].id
 
   key_permissions = [
     "Backup",
@@ -162,7 +162,7 @@ resource "azurerm_key_vault_access_policy" "admin_policy" {
 resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.admin_objects_ids : [])
 
-  scope                = join("", azurerm_key_vault.key_vault.*.id)
+  scope                = azurerm_key_vault.key_vault[0].id
   role_definition_name = "Key Vault Administrator"
   principal_id         = each.value
 }
@@ -170,7 +170,7 @@ resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
 resource "azurerm_role_assignment" "rbac_keyvault_secrets_users" {
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.reader_objects_ids : [])
 
-  scope                = join("", azurerm_key_vault.key_vault.*.id)
+  scope                = azurerm_key_vault.key_vault[0].id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = each.value
 }
@@ -178,7 +178,7 @@ resource "azurerm_role_assignment" "rbac_keyvault_secrets_users" {
 resource "azurerm_role_assignment" "rbac_keyvault_reader" {
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.reader_objects_ids : [])
 
-  scope                = join("", azurerm_key_vault.key_vault.*.id)
+  scope                = azurerm_key_vault.key_vault[0].id
   role_definition_name = "Key Vault Reader"
   principal_id         = each.value
 }
@@ -206,7 +206,7 @@ resource "azurerm_private_endpoint" "pep" {
   private_service_connection {
     name                           = format("%s-psc-kv", module.labels.id)
     is_manual_connection           = false
-    private_connection_resource_id = join("", azurerm_key_vault.key_vault.*.id)
+    private_connection_resource_id = azurerm_key_vault.key_vault[0].id
     subresource_names              = ["vault"]
   }
 
@@ -222,7 +222,7 @@ resource "azurerm_private_endpoint" "pep" {
 ##-----------------------------------------------------------------------------
 data "azurerm_private_endpoint_connection" "private-ip" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
-  name                = join("", azurerm_private_endpoint.pep.*.name)
+  name                = azurerm_private_endpoint.pep[0].name
   resource_group_name = var.resource_group_name
   depends_on          = [azurerm_key_vault.key_vault]
 }
@@ -288,7 +288,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
   count                 = var.enabled && var.addon_vent_link ? 1 : 0
   name                  = format("%s-pdz-vnet-link-kv-addon", module.labels.id)
   resource_group_name   = var.addon_resource_group_name
-  private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone.*.name) : var.existing_private_dns_zone
+  private_dns_zone_name = var.existing_private_dns_zone == null ? azurerm_private_dns_zone.dnszone[0].name : var.existing_private_dns_zone
   virtual_network_id    = var.addon_virtual_network_id
   tags                  = module.labels.tags
 }
@@ -298,11 +298,11 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord" {
   count               = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
-  name                = join("", azurerm_key_vault.key_vault.*.name)
+  name                = azurerm_key_vault.key_vault[0].name
   zone_name           = local.private_dns_zone_name
   resource_group_name = local.valid_rg_name
   ttl                 = 3600
-  records             = [data.azurerm_private_endpoint_connection.private-ip.0.private_service_connection.0.private_ip_address]
+  records             = [data.azurerm_private_endpoint_connection.private-ip[0].private_service_connection[0].private_ip_address]
   tags                = module.labels.tags
   lifecycle {
     ignore_changes = [
@@ -318,11 +318,11 @@ resource "azurerm_private_dns_a_record" "arecord" {
 resource "azurerm_private_dns_a_record" "arecord-1" {
   count               = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
   provider            = azurerm.peer
-  name                = join("", azurerm_key_vault.key_vault.*.name)
+  name                = azurerm_key_vault.key_vault[0].name
   zone_name           = local.private_dns_zone_name
   resource_group_name = local.valid_rg_name
   ttl                 = 3600
-  records             = [data.azurerm_private_endpoint_connection.private-ip.0.private_service_connection.0.private_ip_address]
+  records             = [data.azurerm_private_endpoint_connection.private-ip[0].private_service_connection[0].private_ip_address]
   tags                = module.labels.tags
   lifecycle {
     ignore_changes = [
@@ -337,7 +337,7 @@ resource "azurerm_private_dns_a_record" "arecord-1" {
 resource "azurerm_monitor_diagnostic_setting" "example" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
   name                           = format("%s-Key-vault-diagnostic-log", module.labels.id)
-  target_resource_id             = join("", azurerm_key_vault.key_vault.*.id)
+  target_resource_id             = azurerm_key_vault.key_vault[0].id
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
@@ -366,7 +366,7 @@ resource "azurerm_monitor_diagnostic_setting" "pe_kv_nic" {
   depends_on                     = [azurerm_private_endpoint.pep]
   count                          = var.enabled && var.diagnostic_setting_enable && var.enable_private_endpoint ? 1 : 0
   name                           = format("%s-pe-kv-nic-diagnostic-log", module.labels.id)
-  target_resource_id             = element(azurerm_private_endpoint.pep[count.index].network_interface.*.id, count.index)
+  target_resource_id             = azurerm_private_endpoint.pep[count.index].network_interface[0].id
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
