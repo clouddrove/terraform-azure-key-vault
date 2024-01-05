@@ -363,3 +363,20 @@ variable "managed_hardware_security_module_enabled" {
   type        = bool
   default     = false
 }
+
+variable "sku_name_hsm" {
+  type        = string
+  default     = "Standard_B1"
+  description = "The Name of the SKU used for this Key Vault hsm."
+}
+
+variable "network_acls" {
+  description = "Object with attributes: `bypass`, `default_action`, `ip_rules`, `virtual_network_subnet_ids`. Set to `null` to disable. See https://www.terraform.io/docs/providers/azurerm/r/key_vault.html#bypass for more information."
+  type = object({
+    bypass                     = optional(string, "None"),
+    default_action             = optional(string, "Deny"),
+    ip_rules                   = optional(list(string)),
+    virtual_network_subnet_ids = optional(list(string)),
+  })
+  default = {}
+}

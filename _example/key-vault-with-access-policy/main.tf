@@ -12,7 +12,7 @@ module "resource_group" {
   name        = "app"
   environment = "test"
   label_order = ["environment", "name", ]
-  location    = "Canada Central"
+  location    = "Norway East"
 }
 
 # module "vnet" {
@@ -76,7 +76,7 @@ module "vault" {
   location            = module.resource_group.resource_group_location
 
   reader_objects_ids = [data.azurerm_client_config.current_client_config.object_id]
-  admin_objects_ids = [data.azurerm_client_config.current_client_config.object_id]
+  admin_objects_ids  = [data.azurerm_client_config.current_client_config.object_id]
 
   # virtual_network_id = module.vnet.vnet_id[0]
 
@@ -96,7 +96,7 @@ module "vault" {
   # existing_private_dns_zone_resource_group_name = ""
 
   #### enable diagnostic setting
-  diagnostic_setting_enable  = false
+  diagnostic_setting_enable = false
   # log_analytics_workspace_id = module.log-analytics.workspace_id ## when diagnostic_setting_enable enable,  add log analytics workspace id
 
   # #access_policy
