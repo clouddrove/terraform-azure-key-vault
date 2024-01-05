@@ -2,6 +2,9 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_client_config" "current_client_config" {}
+
+
 module "resource_group" {
   source  = "clouddrove/resource-group/azure"
   version = "1.0.2"
@@ -14,26 +17,26 @@ module "resource_group" {
 
 module "vnet" {
   source  = "clouddrove/vnet/azure"
-  version = "1.0.3"
+  version = "1.0.4"
 
   name                = "app"
   environment         = "test"
   label_order         = ["name", "environment"]
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
-  address_space       = "10.30.0.0/16"
+  address_spaces      = ["10.30.0.0/16"]
 }
 
 module "subnet" {
   source  = "clouddrove/subnet/azure"
-  version = "1.0.2"
+  version = "1.1.0"
 
   name                 = "app"
   environment          = "test"
   label_order          = ["name", "environment"]
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
-  virtual_network_name = join("", module.vnet.vnet_name)
+  virtual_network_name = module.vnet.vnet_name
 
   #subnet
   subnet_names    = ["subnet1", "subnet2"]
@@ -63,19 +66,23 @@ module "log-analytics" {
 
 #Key Vault
 module "vault" {
-  source = "clouddrove/key-vault/azure"
+  source = "../.."
 
-  name        = "annkkdsovvdcc"
-  environment = "test"
-  label_order = ["name", "environment", ]
-
-  resource_group_name = module.resource_group.resource_group_name
-  location            = module.resource_group.resource_group_location
-
-  virtual_network_id = module.vnet.vnet_id[0]
-
+  name                      = "annkdep"
+  environment               = "test"
+  label_order               = ["name", "environment", ]
+  resource_group_name       = module.resource_group.resource_group_name
+  location                  = module.resource_group.resource_group_location
+  reader_objects_ids        = [data.azurerm_client_config.current_client_config.object_id] # for access policy only use reader or admin
+  admin_objects_ids         = [data.azurerm_client_config.current_client_config.object_id] # for access policy only use reader or admin
+  virtual_network_id        = module.vnet.vnet_id
   subnet_id                 = module.subnet.default_subnet_id[0]
   enable_rbac_authorization = false
+  network_acls = {
+    bypass         = "AzureServices"
+    default_action = "Deny"
+    ip_rules       = ["1.2.3.4/32"]
+  }
   #private endpoint
   enable_private_endpoint = true
   ########Following to be uncommnented only when using DNS Zone from different subscription along with existing DNS zone.
@@ -91,54 +98,5 @@ module "vault" {
 
   #### enable diagnostic setting
   diagnostic_setting_enable  = true
-  log_analytics_workspace_id = module.log-analytics.workspace_id ## when diagnostic_setting_enable enable,  add log analytics workspace id
-
-  #access_policy
-  access_policy = [
-    {
-      object_id = ""
-      key_permissions = [
-        "Get",
-        "List",
-        "Update",
-        "Create",
-        "Import",
-        "Delete",
-        "Recover",
-        "Backup",
-        "Restore",
-        "UnwrapKey",
-        "WrapKey",
-        "GetRotationPolicy"
-      ]
-      certificate_permissions = [
-        "Get",
-        "List",
-        "Update",
-        "Create",
-        "Import",
-        "Delete",
-        "Recover",
-        "Backup",
-        "Restore",
-        "ManageContacts",
-        "ManageIssuers",
-        "GetIssuers",
-        "ListIssuers",
-        "SetIssuers",
-        "DeleteIssuers"
-      ]
-      secret_permissions = [
-        "Get",
-        "List",
-        "Set",
-        "Delete",
-        "Recover",
-        "Backup",
-        "Restore"
-      ]
-      storage_permissions = []
-
-    }
-  ]
+  log_analytics_workspace_id = module.log-analytics.workspace_id ## when diagnostic_setting_enable enable,add log analytics workspace id
 }
