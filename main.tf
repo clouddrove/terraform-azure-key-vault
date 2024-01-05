@@ -387,7 +387,7 @@ resource "azurerm_monitor_diagnostic_setting" "pe_kv_nic" {
 resource "azurerm_key_vault_managed_hardware_security_module" "keyvault_hsm" {
   count = var.enabled && var.managed_hardware_security_module_enabled ? 1 : 0
 
-  name = format("%s-hsm-kv", module.labels.id)
+  name                          = format("%s-hsm-kv", module.labels.id)
   location                      = var.location
   resource_group_name           = var.resource_group_name
   sku_name                      = var.sku_name_hsm
