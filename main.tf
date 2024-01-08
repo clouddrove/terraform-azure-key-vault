@@ -30,6 +30,7 @@ module "labels" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_key_vault" "key_vault" {
   count                           = var.enabled ? 1 : 0
+
   name                            = format("%s-kv", module.labels.id)
   location                        = var.location
   resource_group_name             = var.resource_group_name
@@ -197,7 +198,8 @@ provider "azurerm" {
 ##Below resource will deploy private endpoint for key vault.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_endpoint" "pep" {
-  count               = var.enable_private_endpoint ? 1 : 0
+  count               = var.enabled && var.enable_private_endpoint ? 1 : 0
+
   name                = format("%s-pe-kv", module.labels.id)
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -209,7 +211,6 @@ resource "azurerm_private_endpoint" "pep" {
     private_connection_resource_id = azurerm_key_vault.key_vault[0].id
     subresource_names              = ["vault"]
   }
-
   lifecycle {
     ignore_changes = [
       tags,
@@ -222,6 +223,7 @@ resource "azurerm_private_endpoint" "pep" {
 ##-----------------------------------------------------------------------------
 data "azurerm_private_endpoint_connection" "private-ip" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
+
   name                = azurerm_private_endpoint.pep[0].name
   resource_group_name = var.resource_group_name
   depends_on          = [azurerm_key_vault.key_vault]
@@ -233,6 +235,7 @@ data "azurerm_private_endpoint_connection" "private-ip" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone" "dnszone" {
   count               = var.enabled && var.existing_private_dns_zone == null && var.enable_private_endpoint ? 1 : 0
+
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = var.resource_group_name
   tags                = module.labels.tags
@@ -244,6 +247,7 @@ resource "azurerm_private_dns_zone" "dnszone" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
   count                 = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
+
   name                  = var.existing_private_dns_zone == null ? format("%s-pdz-vnet-link-kv", module.labels.id) : format("%s-pdz-vnet-link-kv-1", module.labels.id)
   resource_group_name   = local.valid_rg_name
   private_dns_zone_name = local.private_dns_zone_name
@@ -258,6 +262,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
   provider              = azurerm.peer
   count                 = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
+
   name                  = var.existing_private_dns_zone == null ? format("%s-pdz-vnet-link-kv", module.labels.id) : format("%s-pdz-vnet-link-kv-1", module.labels.id)
   resource_group_name   = local.valid_rg_name
   private_dns_zone_name = local.private_dns_zone_name
@@ -272,7 +277,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
   provider              = azurerm.peer
-  count                 = var.multi_sub_vnet_link && var.existing_private_dns_zone != null ? 1 : 0
+  count                 = var.enabled && var.multi_sub_vnet_link && var.existing_private_dns_zone != null ? 1 : 0
+
   name                  = format("%s-pdz-vnet-link-kv-1", module.labels.id)
   resource_group_name   = var.existing_private_dns_zone_resource_group_name
   private_dns_zone_name = var.existing_private_dns_zone
@@ -286,6 +292,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
   count                 = var.enabled && var.addon_vent_link ? 1 : 0
+
   name                  = format("%s-pdz-vnet-link-kv-addon", module.labels.id)
   resource_group_name   = var.addon_resource_group_name
   private_dns_zone_name = var.existing_private_dns_zone == null ? azurerm_private_dns_zone.dnszone[0].name : var.existing_private_dns_zone
@@ -298,6 +305,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord" {
   count               = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
+  
   name                = azurerm_key_vault.key_vault[0].name
   zone_name           = local.private_dns_zone_name
   resource_group_name = local.valid_rg_name
@@ -317,6 +325,7 @@ resource "azurerm_private_dns_a_record" "arecord" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord-1" {
   count               = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
+  
   provider            = azurerm.peer
   name                = azurerm_key_vault.key_vault[0].name
   zone_name           = local.private_dns_zone_name
@@ -336,6 +345,7 @@ resource "azurerm_private_dns_a_record" "arecord-1" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "example" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
+
   name                           = format("%s-Key-vault-diagnostic-log", module.labels.id)
   target_resource_id             = azurerm_key_vault.key_vault[0].id
   storage_account_id             = var.storage_account_id
@@ -365,6 +375,7 @@ resource "azurerm_monitor_diagnostic_setting" "example" {
 resource "azurerm_monitor_diagnostic_setting" "pe_kv_nic" {
   depends_on                     = [azurerm_private_endpoint.pep]
   count                          = var.enabled && var.diagnostic_setting_enable && var.enable_private_endpoint ? 1 : 0
+
   name                           = format("%s-pe-kv-nic-diagnostic-log", module.labels.id)
   target_resource_id             = azurerm_private_endpoint.pep[count.index].network_interface[0].id
   storage_account_id             = var.storage_account_id
