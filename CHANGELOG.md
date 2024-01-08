@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-01-08
+### :bug: Bug Fixes
+- [`bb5a7b0`](https://github.com/clouddrove/terraform-azure-key-vault/commit/bb5a7b04968efc4339740bf78ca7a1ff3d142b0c) - deprecation removed and hsm added *(commit by [@d4kverma](https://github.com/d4kverma))*
+
+### :construction_worker: Build System
+- [`3289572`](https://github.com/clouddrove/terraform-azure-key-vault/commit/32895724ed2d6d570e432e5513840c027fcdf57a) - Fix node-version in sementic-release workflow *(commit by [@nileshgadgi](https://github.com/nileshgadgi))*
+
+
 ## [1.0.5] - 2023-04-24
 ### :sparkles: New Features
 - [`35ec489`](https://github.com/clouddrove/terraform-azure-key-vault/commit/35ec48907fa0d604c753cc72da2ada0d31ff10d1) - Added Support for DNS zone in different subscription
@@ -37,3 +45,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.0.3]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.2...1.0.3
 [1.0.4]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.3...1.0.4
 [1.0.5]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.4...1.0.5
+
+[1.1.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.5...1.1.0
