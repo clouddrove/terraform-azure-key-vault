@@ -13,8 +13,11 @@
 
 <p align="center">
 
-<a href="https://www.terraform.io">
-  <img src="https://img.shields.io/badge/Terraform-v1.1.7-green" alt="Terraform">
+<a href="https://github.com/clouddrove/terraform-azure-key-vault/releases/latest">
+  <img src="https://img.shields.io/github/release/clouddrove/terraform-azure-key-vault.svg" alt="Latest Release">
+</a>
+<a href="https://github.com/clouddrove/terraform-azure-key-vault/actions/workflows/tfsec.yml">
+  <img src="https://github.com/clouddrove/terraform-azure-key-vault/actions/workflows/tfsec.yml/badge.svg" alt="tfsec">
 </a>
 <a href="LICENSE.md">
   <img src="https://img.shields.io/badge/License-APACHE-blue.svg" alt="Licence">
@@ -51,12 +54,6 @@ We have [*fifty plus terraform modules*][terraform_modules]. A few of them are c
 
 This module has a few dependencies: 
 
-- [Terraform 1.x.x](https://learn.hashicorp.com/terraform/getting-started/install.html)
-- [Go](https://golang.org/doc/install)
-- [github.com/stretchr/testify/assert](https://github.com/stretchr/testify)
-- [github.com/gruntwork-io/terratest/modules/terraform](https://github.com/gruntwork-io/terratest)
-
-
 
 
 
@@ -72,46 +69,51 @@ This module has a few dependencies:
 Here is an example of how you can use this module in your inventory structure:
   #### key-vault with access policy
 ```hcl
-module "key_vault" {
- source                      = "clouddrove/key-vault/azure"
- name                        = "annkkdsovvdcc"
- environment                 = "test"
- label_order                 = ["name", "environment", ]
-
- resource_group_name         = module.resource_group.resource_group_name
-
- virtual_network_id          = module.vnet.vnet_id[0]
- subnet_id                   = module.subnet.default_subnet_id[0]
- #access_policy
- access_policy               = [{}]
-
- #### enable diagnostic setting
- diagnostic_setting_enable  = false
- log_analytics_workspace_id = ""
+ module "key_vault" {
+ source                    = "clouddrove/key-vault/azure"
+ name                      = "anfdcc"
+ environment               = "test"
+ label_order               = ["name", "environment", ]
+ resource_group_name       = "*****"
+ location                  = "*****"
+ admin_objects_ids         = [data.azurerm_client_config.current_client_config.object_id]
+ virtual_network_id        = "*****"
+ subnet_id                 = "*****"
+ enable_rbac_authorization = false
+ network_acls              = {
+  bypass                   = "AzureServices"
+  default_action           = "Deny"
+  ip_rules                 = ["1.2.3.4/32"]
+  }
+ #private endpoint
+ enable_private_endpoint   = false
+ diagnostic_setting_enable = false
  }
-  ```
+```
 #### key-vault with RBAC
-  ```hcl
-module "key_vault" {
- source                  = "clouddrove/key-vault/azure"
- name                    = "annkkdsovvdcc"
- environment             = "test"
- label_order             = ["name", "environment", ]
-
- resource_group_name     = module.resource_group.resource_group_name
-
- virtual_network_id      = module.vnet.vnet_id[0]
- subnet_id               = module.subnet.default_subnet_id[0]
- ##RBAC
+```hcl
+ module "key_vault" {
+ source                    = "clouddrove/key-vault/azure"
+ name                      = "anfdcc"
+ environment               = "test"
+ label_order               = ["name", "environment", ]
+ resource_group_name       = "*****"
+ location                  = "*****"
+ reader_objects_ids        = [data.azurerm_client_config.current_client_config.object_id]
+ admin_objects_ids         = [data.azurerm_client_config.current_client_config.object_id]
+ virtual_network_id        = "*****"
+ subnet_id                 = "*****"
  enable_rbac_authorization = true
- principal_id              = ["71d1XXXXXXXXXXXXX166d7c97", "2fa59XXXXXXXXXXXXXX82716fb05"]
- role_definition_name      = ["Key Vault Administrator", ]
-
- #### enable diagnostic setting
- diagnostic_setting_enable  = false
- log_analytics_workspace_id = ""
+ network_acls              = {
+  bypass                   = "AzureServices"
+  default_action           = "Deny"
+  ip_rules                 = ["1.2.3.4/32"]
+  }
+ #private endpoint
+ enable_private_endpoint   = false
+ diagnostic_setting_enable = false
  }
-  ```
+```
 
 
 
@@ -122,17 +124,12 @@ module "key_vault" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| Metric\_enable | Is this Diagnostic Metric enabled? Defaults to true. | `bool` | `true` | no |
-| access\_policies | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
-| access\_policy | Map of access policies for an object\_id (user, service principal, security group) to backend. | <pre>list(object({<br>    object_id               = string,<br>    certificate_permissions = list(string),<br>    key_permissions         = list(string),<br>    secret_permissions      = list(string),<br>    storage_permissions     = list(string),<br>  }))</pre> | `[]` | no |
 | addon\_resource\_group\_name | The name of the addon vnet resource group | `string` | `""` | no |
 | addon\_vent\_link | The name of the addon vnet | `bool` | `false` | no |
 | addon\_virtual\_network\_id | The name of the addon vnet link vnet id | `string` | `""` | no |
-| alias | Alias for local provider in module. | `string` | `null` | no |
+| admin\_objects\_ids | IDs of the objects that can do all operations on all keys, secrets and certificates. | `list(string)` | `[]` | no |
 | alias\_sub | Different subscription id for local provider(id of diff sub in which DNS zone is present). | `string` | `null` | no |
-| category | The name of a Diagnostic Log Category Group for this Resource. | `string` | `null` | no |
 | certificate\_contacts | Contact information to send notifications triggered by certificate lifetime events | <pre>list(object({<br>    email = string<br>    name  = optional(string)<br>    phone = optional(string)<br>  }))</pre> | `[]` | no |
-| days | The number of days for which this Retention Policy should apply. | `number` | `"90"` | no |
 | diagnostic\_setting\_enable | n/a | `bool` | `false` | no |
 | diff\_sub | Flag to tell whether dns zone is in different sub or not. | `bool` | `false` | no |
 | enable\_private\_endpoint | Manages a Private Endpoint to Azure database for MySQL | `bool` | `true` | no |
@@ -146,34 +143,28 @@ module "key_vault" {
 | eventhub\_name | Specifies the name of the Event Hub where Diagnostics Data should be sent. | `string` | `null` | no |
 | existing\_private\_dns\_zone | Name of the existing private DNS zone | `string` | `null` | no |
 | existing\_private\_dns\_zone\_resource\_group\_name | The name of the existing resource group | `string` | `""` | no |
-| key\_enabled | Flag to control creation of key vault key resource. | `bool` | `false` | no |
+| kv\_logs | n/a | <pre>object({<br>    enabled        = bool<br>    category       = optional(list(string))<br>    category_group = optional(list(string))<br>  })</pre> | <pre>{<br>  "category_group": [<br>    "AllLogs"<br>  ],<br>  "enabled": true<br>}</pre> | no |
 | label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
 | location | Location where resource group will be created. | `string` | `null` | no |
 | log\_analytics\_destination\_type | Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table. | `string` | `"AzureDiagnostics"` | no |
 | log\_analytics\_workspace\_id | n/a | `string` | `null` | no |
-| log\_enabled | Is this Diagnostic Log enabled? Defaults to true. | `string` | `true` | no |
+| managed\_hardware\_security\_module\_enabled | Create a KeyVault Managed HSM resource if enabled. Changing this forces a new resource to be created. | `bool` | `false` | no |
 | managedby | ManagedBy, eg ''. | `string` | `""` | no |
+| metric\_enabled | Is this Diagnostic Metric enabled? Defaults to true. | `bool` | `true` | no |
 | multi\_sub\_vnet\_link | Flag to control creation of vnet link for dns zone in different subscription | `bool` | `false` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
-| network\_acls\_bypass | Specifies which traffic can bypass the network rules. Possible values are AzureServices and None. | `string` | `null` | no |
-| network\_acls\_default\_action | The Default Action to use when no rules match from ip\_rules / virtual\_network\_subnet\_ids. Possible values are Allow and Deny. | `string` | `"Deny"` | no |
-| network\_acls\_ip\_rules | (Optional) One or more IP Addresses, or CIDR Blocks which should be able to access the Key Vault. | `list(string)` | `null` | no |
-| network\_acls\_subnet\_ids | (Optional) One or more Subnet ID's which should be able to access this Key Vault. | `list(string)` | `null` | no |
-| principal\_id | The ID of the Principal (User, Group or Service Principal) to assign the Role Definition to. Changing this forces a new resource to be created. | `list(string)` | `[]` | no |
+| network\_acls | Object with attributes: `bypass`, `default_action`, `ip_rules`, `virtual_network_subnet_ids`. Set to `null` to disable. See https://www.terraform.io/docs/providers/azurerm/r/key_vault.html#bypass for more information. | <pre>object({<br>    bypass                     = optional(string, "None"),<br>    default_action             = optional(string, "Deny"),<br>    ip_rules                   = optional(list(string)),<br>    virtual_network_subnet_ids = optional(list(string)),<br>  })</pre> | `{}` | no |
 | public\_network\_access\_enabled | (Optional) Whether public network access is allowed for this Key Vault. Defaults to true | `bool` | `true` | no |
 | purge\_protection\_enabled | Is Purge Protection enabled for this Key Vault? Defaults to false | `bool` | `true` | no |
+| reader\_objects\_ids | IDs of the objects that can read all keys, secrets and certificates. | `list(string)` | `[]` | no |
 | repository | Terraform current module repo | `string` | `""` | no |
 | resource\_group\_name | A container that holds related resources for an Azure solution | `string` | `""` | no |
-| retention\_policy\_enabled | Is this Retention Policy enabled? | `bool` | `false` | no |
-| role\_definition\_name | The name of a built-in Role. Changing this forces a new resource to be created. Conflicts with role\_definition\_id | `list(string)` | `[]` | no |
-| secrets | List of secrets for be created | `map` | `{}` | no |
 | sku\_name | The Name of the SKU used for this Key Vault. Possible values are standard and premium | `string` | `"standard"` | no |
+| sku\_name\_hsm | The Name of the SKU used for this Key Vault hsm. | `string` | `"Standard_B1"` | no |
 | soft\_delete\_retention\_days | The number of days that items should be retained for once soft-deleted. The valid value can be between 7 and 90 days | `number` | `90` | no |
 | storage\_account\_id | The ID of the Storage Account where logs should be sent. | `string` | `null` | no |
 | subnet\_id | The resource ID of the subnet | `string` | `""` | no |
-| tags | A map of tags to add to all resources | `map(string)` | `{}` | no |
 | virtual\_network\_id | The name of the virtual network | `string` | `""` | no |
-| virtual\_network\_name | The name of the virtual network | `string` | `""` | no |
 
 ## Outputs
 
