@@ -8,7 +8,7 @@ data "azurerm_client_config" "current_client_config" {}
 ##-----------------------------------------------------------------------------
 locals {
   valid_rg_name         = var.existing_private_dns_zone == null ? var.resource_group_name : var.existing_private_dns_zone_resource_group_name
-  private_dns_zone_name = var.existing_private_dns_zone == null ? azurerm_private_dns_zone.dnszone[0].name : var.existing_private_dns_zone
+  private_dns_zone_name = var.enable_private_endpoint ? var.existing_private_dns_zone == null ? azurerm_private_dns_zone.dnszone[0].name : var.existing_private_dns_zone : null
 }
 
 ##-----------------------------------------------------------------------------
@@ -123,6 +123,10 @@ resource "azurerm_key_vault_access_policy" "admin_policy" {
     "Update",
     "Verify",
     "WrapKey",
+    "Rotate",
+    "GetRotationPolicy",
+    "SetRotationPolicy",
+    "Release"
   ]
 
   secret_permissions = [
