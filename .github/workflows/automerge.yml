@@ -8,4 +8,4 @@
         secrets:
           GITHUB: ${{ secrets.GITHUB }}
         with:
-          tfcheck: 'complete / Get min/max versions'
+          tfcheck: 'basic-example / Check code format'
