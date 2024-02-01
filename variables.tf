@@ -261,7 +261,7 @@ variable "network_acls" {
   default = {}
 }
 variable "extra_tags" {
-type = map(list)
+type = map(string)
 default = null
 description = "Variable to pass extra tags."
 }
