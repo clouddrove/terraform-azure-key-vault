@@ -31,9 +31,9 @@ variable "managedby" {
 }
 
 variable "extra_tags" {
-type = map(string)
-default = null
-description = "Variable to pass extra tags."
+  type        = map(string)
+  default     = null
+  description = "Variable to pass extra tags."
 }
 
 variable "enabled" {
