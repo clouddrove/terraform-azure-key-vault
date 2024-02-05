@@ -143,6 +143,7 @@ Here is an example of how you can use this module in your inventory structure:
 | eventhub\_name | Specifies the name of the Event Hub where Diagnostics Data should be sent. | `string` | `null` | no |
 | existing\_private\_dns\_zone | Name of the existing private DNS zone | `string` | `null` | no |
 | existing\_private\_dns\_zone\_resource\_group\_name | The name of the existing resource group | `string` | `""` | no |
+| extra\_tags | Variable to pass extra tags. | `map(string)` | `null` | no |
 | kv\_logs | n/a | <pre>object({<br>    enabled        = bool<br>    category       = optional(list(string))<br>    category_group = optional(list(string))<br>  })</pre> | <pre>{<br>  "category_group": [<br>    "AllLogs"<br>  ],<br>  "enabled": true<br>}</pre> | no |
 | label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
 | location | Location where resource group will be created. | `string` | `null` | no |
