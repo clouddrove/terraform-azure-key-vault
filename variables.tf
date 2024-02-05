@@ -30,6 +30,12 @@ variable "managedby" {
   description = "ManagedBy, eg ''."
 }
 
+variable "extra_tags" {
+  type        = map(string)
+  default     = null
+  description = "Variable to pass extra tags."
+}
+
 variable "enabled" {
   type        = bool
   description = "Set to false to prevent the module from creating any resources."
