@@ -38,8 +38,8 @@ variable "extra_tags" {
 
 variable "enabled" {
   type        = bool
-  description = "Set to false to prevent the module from creating any resources."
   default     = true
+  description = "Set to false to prevent the module from creating any resources."
 }
 
 variable "resource_group_name" {
