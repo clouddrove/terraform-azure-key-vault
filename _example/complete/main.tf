@@ -1,5 +1,14 @@
 provider "azurerm" {
   features {}
+  subscription_id            = "068245d4-3c94-42fe-9c4d-9e5e1cabc60c"
+  skip_provider_registration = "true"
+}
+
+provider "azurerm" {
+  features {}
+  alias                      = "peer"
+  subscription_id            = "068245d4-3c94-42fe-9c4d-9e5e1cabc60c"
+  skip_provider_registration = "true"
 }
 
 data "azurerm_client_config" "current_client_config" {}
@@ -8,7 +17,7 @@ module "resource_group" {
   source  = "clouddrove/resource-group/azure"
   version = "1.0.2"
 
-  name        = "app"
+  name        = "keyapp"
   environment = "test"
   label_order = ["environment", "name", ]
   location    = "Canada Central"
@@ -65,9 +74,15 @@ module "log-analytics" {
 
 #Key Vault
 module "vault" {
-  source = "../.."
+  source     = "../.."
+  depends_on = [module.subnet]
 
-  name                      = "anfdcc"
+  providers = {
+    azurerm.dns_sub  = azurerm.peer,
+    azurerm.main_sub = azurerm
+  }
+
+  name                      = "deepanfdcc"
   environment               = "test"
   label_order               = ["name", "environment", ]
   resource_group_name       = module.resource_group.resource_group_name
@@ -86,13 +101,13 @@ module "vault" {
   enable_private_endpoint = true
   ########Following to be uncommnented only when using DNS Zone from different subscription along with existing DNS zone.
 
-  # diff_sub                                      = true
+  diff_sub = true
   # alias                                         = ""
   # alias_sub                                     = ""
 
   #########Following to be uncommmented when using DNS zone from different resource group or different subscription.
-  # existing_private_dns_zone                     = ""
-  # existing_private_dns_zone_resource_group_name = ""
+  existing_private_dns_zone                     = "privatelink.vaultcore.azure.net"
+  existing_private_dns_zone_resource_group_name = "dns-d"
 
   #### enable diagnostic setting
   diagnostic_setting_enable  = true
