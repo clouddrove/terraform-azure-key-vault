@@ -1,13 +1,13 @@
 provider "azurerm" {
   features {}
-  subscription_id            = "068245d4-3c94-42fe-9c4d-9e5e1cabc60c"
+  subscription_id            = "01111111111110-11-11-11-11"
   skip_provider_registration = "true"
 }
 
 provider "azurerm" {
   features {}
   alias                      = "peer"
-  subscription_id            = "068245d4-3c94-42fe-9c4d-9e5e1cabc60c"
+  subscription_id            = "01111111111110-11-11-11-11"
   skip_provider_registration = "true"
 }
 
@@ -101,13 +101,13 @@ module "vault" {
   enable_private_endpoint = true
   ########Following to be uncommnented only when using DNS Zone from different subscription along with existing DNS zone.
 
-  diff_sub = true
+  # diff_sub = true
   # alias                                         = ""
   # alias_sub                                     = ""
 
   #########Following to be uncommmented when using DNS zone from different resource group or different subscription.
-  existing_private_dns_zone                     = "privatelink.vaultcore.azure.net"
-  existing_private_dns_zone_resource_group_name = "dns-d"
+  # existing_private_dns_zone                     = "privatelink.vaultcore.azure.net"
+  # existing_private_dns_zone_resource_group_name = "dns-rg"
 
   #### enable diagnostic setting
   diagnostic_setting_enable  = true
