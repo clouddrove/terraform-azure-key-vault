@@ -296,7 +296,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
 ## Below resource will be created when extra vnet link is required in dns zone in same subscription. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
-  count = var.enabled && var.addon_vent_link ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.addon_vent_link ? 1 : 0
 
   name                  = format("%s-pdz-vnet-link-kv-addon", module.labels.id)
   resource_group_name   = var.addon_resource_group_name
@@ -309,7 +310,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
 ## Below resource will create dns A record for private ip of private endpoint in private dns zone. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord" {
-  count = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
 
   name                = azurerm_key_vault.key_vault[0].name
   zone_name           = local.private_dns_zone_name
