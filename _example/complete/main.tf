@@ -1,13 +1,13 @@
 provider "azurerm" {
   features {}
-  subscription_id            = "01111111111110-11-11-11-11"
+  subscription_id            = "01110-12010122022111111c"
   skip_provider_registration = "true"
 }
 
 provider "azurerm" {
   features {}
   alias                      = "peer"
-  subscription_id            = "01111111111110-11-11-11-11"
+  subscription_id            = "01110-12010122022111111c" #change this to other subscription if dns hosted in other subscription.
   skip_provider_registration = "true"
 }
 
@@ -37,7 +37,7 @@ module "vnet" {
 
 module "subnet" {
   source  = "clouddrove/subnet/azure"
-  version = "1.1.0"
+  version = "1.2.0"
 
   name                 = "app"
   environment          = "test"
@@ -78,7 +78,7 @@ module "vault" {
   depends_on = [module.subnet]
 
   providers = {
-    azurerm.dns_sub  = azurerm.peer,
+    azurerm.dns_sub  = azurerm.peer, #chagnge this to other alias if dns hosted in other subscription.
     azurerm.main_sub = azurerm
   }
 
