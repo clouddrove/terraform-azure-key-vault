@@ -231,13 +231,6 @@ variable "diff_sub" {
   description = "Flag to tell whether dns zone is in different sub or not."
 }
 
-variable "alias_sub" {
-  # To be set when you are using a DNS zone from different subscription.
-  type        = string
-  default     = null
-  description = "Different subscription id for local provider(id of diff sub in which DNS zone is present)."
-}
-
 variable "multi_sub_vnet_link" {
   type        = bool
   default     = false
