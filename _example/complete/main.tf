@@ -1,5 +1,14 @@
 provider "azurerm" {
   features {}
+  subscription_id            = "01110-12010122022111111c"
+  skip_provider_registration = "true"
+}
+
+provider "azurerm" {
+  features {}
+  alias                      = "peer"
+  subscription_id            = "01110-12010122022111111c" #change this to other subscription if dns hosted in other subscription.
+  skip_provider_registration = "true"
 }
 
 data "azurerm_client_config" "current_client_config" {}
@@ -8,7 +17,7 @@ module "resource_group" {
   source  = "clouddrove/resource-group/azure"
   version = "1.0.2"
 
-  name        = "app"
+  name        = "keyapp"
   environment = "test"
   label_order = ["environment", "name", ]
   location    = "Canada Central"
@@ -28,7 +37,7 @@ module "vnet" {
 
 module "subnet" {
   source  = "clouddrove/subnet/azure"
-  version = "1.1.0"
+  version = "1.2.0"
 
   name                 = "app"
   environment          = "test"
@@ -65,9 +74,15 @@ module "log-analytics" {
 
 #Key Vault
 module "vault" {
-  source = "../.."
+  source     = "../.."
+  depends_on = [module.subnet]
 
-  name                      = "anfdcc"
+  providers = {
+    azurerm.dns_sub  = azurerm.peer, #chagnge this to other alias if dns hosted in other subscription.
+    azurerm.main_sub = azurerm
+  }
+
+  name                      = "deepanfdcc"
   environment               = "test"
   label_order               = ["name", "environment", ]
   resource_group_name       = module.resource_group.resource_group_name
@@ -86,13 +101,13 @@ module "vault" {
   enable_private_endpoint = true
   ########Following to be uncommnented only when using DNS Zone from different subscription along with existing DNS zone.
 
-  # diff_sub                                      = true
+  # diff_sub = true
   # alias                                         = ""
   # alias_sub                                     = ""
 
   #########Following to be uncommmented when using DNS zone from different resource group or different subscription.
-  # existing_private_dns_zone                     = ""
-  # existing_private_dns_zone_resource_group_name = ""
+  # existing_private_dns_zone                     = "privatelink.vaultcore.azure.net"
+  # existing_private_dns_zone_resource_group_name = "dns-rg"
 
   #### enable diagnostic setting
   diagnostic_setting_enable  = true
