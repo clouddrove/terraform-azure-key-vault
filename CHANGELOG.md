@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2024-07-26
+### :sparkles: New Features
+- [`173b47d`](https://github.com/clouddrove/terraform-azure-key-vault/commit/173b47d2cbb8c31cc439c25daa9a6ffad7438393) - Added support for extra_tags *(PR [#26](https://github.com/clouddrove/terraform-azure-key-vault/pull/26) by [@Rupalgw](https://github.com/Rupalgw))*
+
+### :bug: Bug Fixes
+- [`766d5b0`](https://github.com/clouddrove/terraform-azure-key-vault/commit/766d5b0e0ba42481f12a58066a11bbc44d0e53e9) - fixed multiple provider issue for depends upon cond. *(commit by [@d4kverma](https://github.com/d4kverma))*
+
+
 ## [1.1.0] - 2024-01-08
 ### :bug: Bug Fixes
 - [`bb5a7b0`](https://github.com/clouddrove/terraform-azure-key-vault/commit/bb5a7b04968efc4339740bf78ca7a1ff3d142b0c) - deprecation removed and hsm added *(commit by [@d4kverma](https://github.com/d4kverma))*
@@ -47,3 +55,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.0.5]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.4...1.0.5
 
 [1.1.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.5...1.1.0
+[1.2.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.1.0...1.2.0
