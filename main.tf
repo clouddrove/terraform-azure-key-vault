@@ -32,6 +32,7 @@ module "labels" {
 resource "azurerm_key_vault" "key_vault" {
   count = var.enabled ? 1 : 0
 
+  provider                        = azurerm.main_sub
   name                            = format("%s-kv", module.labels.id)
   location                        = var.location
   resource_group_name             = var.resource_group_name
@@ -78,6 +79,7 @@ resource "azurerm_key_vault" "key_vault" {
 ## if rbac is enabled then below resource will create. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_key_vault_access_policy" "readers_policy" {
+  provider = azurerm.main_sub
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? [] : var.reader_objects_ids)
 
   object_id    = each.value
@@ -101,6 +103,7 @@ resource "azurerm_key_vault_access_policy" "readers_policy" {
 }
 
 resource "azurerm_key_vault_access_policy" "admin_policy" {
+  provider = azurerm.main_sub
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? [] : var.admin_objects_ids)
 
   object_id    = each.value
@@ -166,6 +169,7 @@ resource "azurerm_key_vault_access_policy" "admin_policy" {
 ## if rbac is enabled then below resource will create. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
+  provider = azurerm.main_sub
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.admin_objects_ids : [])
 
   scope                = azurerm_key_vault.key_vault[0].id
@@ -174,6 +178,7 @@ resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
 }
 
 resource "azurerm_role_assignment" "rbac_keyvault_secrets_users" {
+  provider = azurerm.main_sub
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.reader_objects_ids : [])
 
   scope                = azurerm_key_vault.key_vault[0].id
@@ -182,6 +187,7 @@ resource "azurerm_role_assignment" "rbac_keyvault_secrets_users" {
 }
 
 resource "azurerm_role_assignment" "rbac_keyvault_reader" {
+  provider = azurerm.main_sub
   for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.reader_objects_ids : [])
 
   scope                = azurerm_key_vault.key_vault[0].id
@@ -189,21 +195,12 @@ resource "azurerm_role_assignment" "rbac_keyvault_reader" {
   principal_id         = each.value
 }
 
-##----------------------------------------------------------------------------- 
-## Provider block
-## To be used only when there is existing private dns zone in different subscription. Mention other subscription id in 'var.alias_sub'. 
-##-----------------------------------------------------------------------------
-provider "azurerm" {
-  alias = "peer"
-  features {}
-  subscription_id = var.alias_sub
-}
-
 ##-----------------------------------------------------------------------------
 ##Below resource will deploy private endpoint for key vault.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_endpoint" "pep" {
-  count = var.enabled && var.enable_private_endpoint ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.enable_private_endpoint ? 1 : 0
 
   name                = format("%s-pe-kv", module.labels.id)
   location            = var.location
@@ -227,7 +224,8 @@ resource "azurerm_private_endpoint" "pep" {
 ## Data block to retreive private ip of private endpoint.
 ##-----------------------------------------------------------------------------
 data "azurerm_private_endpoint_connection" "private-ip" {
-  count = var.enabled && var.enable_private_endpoint ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.enable_private_endpoint ? 1 : 0
 
   name                = azurerm_private_endpoint.pep[0].name
   resource_group_name = var.resource_group_name
@@ -239,7 +237,8 @@ data "azurerm_private_endpoint_connection" "private-ip" {
 ## Will be created only when there is no existing private dns zone and private endpoint is enabled. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone" "dnszone" {
-  count = var.enabled && var.existing_private_dns_zone == null && var.enable_private_endpoint ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.existing_private_dns_zone == null && var.enable_private_endpoint ? 1 : 0
 
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = var.resource_group_name
@@ -251,7 +250,8 @@ resource "azurerm_private_dns_zone" "dnszone" {
 ## Vnet link will be created when there is no existing private dns zone or existing private dns zone is in same subscription.  
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
-  count = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
 
   name                  = var.existing_private_dns_zone == null ? format("%s-pdz-vnet-link-kv", module.labels.id) : format("%s-pdz-vnet-link-kv-1", module.labels.id)
   resource_group_name   = local.valid_rg_name
@@ -265,7 +265,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
 ## Vnet link will be created when existing private dns zone is in different subscription. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
-  provider = azurerm.peer
+  provider = azurerm.dns_sub
   count    = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
 
   name                  = var.existing_private_dns_zone == null ? format("%s-pdz-vnet-link-kv", module.labels.id) : format("%s-pdz-vnet-link-kv-1", module.labels.id)
@@ -281,7 +281,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
 ## This resource is deployed when more than 1 vnet link is required and module can be called again to do so without deploying other key vault resources. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
-  provider = azurerm.peer
+  provider = azurerm.dns_sub
   count    = var.enabled && var.multi_sub_vnet_link && var.existing_private_dns_zone != null ? 1 : 0
 
   name                  = format("%s-pdz-vnet-link-kv-1", module.labels.id)
@@ -296,7 +296,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
 ## Below resource will be created when extra vnet link is required in dns zone in same subscription. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
-  count = var.enabled && var.addon_vent_link ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.addon_vent_link ? 1 : 0
 
   name                  = format("%s-pdz-vnet-link-kv-addon", module.labels.id)
   resource_group_name   = var.addon_resource_group_name
@@ -309,7 +310,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
 ## Below resource will create dns A record for private ip of private endpoint in private dns zone. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord" {
-  count = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
 
   name                = azurerm_key_vault.key_vault[0].name
   zone_name           = local.private_dns_zone_name
@@ -329,9 +331,10 @@ resource "azurerm_private_dns_a_record" "arecord" {
 ## This resource will be created when private dns is in different subscription. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord-1" {
-  count = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
+  provider = azurerm.dns_sub
+  count    = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
 
-  provider            = azurerm.peer
+
   name                = azurerm_key_vault.key_vault[0].name
   zone_name           = local.private_dns_zone_name
   resource_group_name = local.valid_rg_name
@@ -349,7 +352,8 @@ resource "azurerm_private_dns_a_record" "arecord-1" {
 ## Below resources will create diagnostic setting for key vault and its components. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "example" {
-  count = var.enabled && var.diagnostic_setting_enable ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.diagnostic_setting_enable ? 1 : 0
 
   name                           = format("%s-Key-vault-diagnostic-log", module.labels.id)
   target_resource_id             = azurerm_key_vault.key_vault[0].id
@@ -378,6 +382,7 @@ resource "azurerm_monitor_diagnostic_setting" "example" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "pe_kv_nic" {
+  provider   = azurerm.main_sub
   depends_on = [azurerm_private_endpoint.pep]
   count      = var.enabled && var.diagnostic_setting_enable && var.enable_private_endpoint ? 1 : 0
 
@@ -401,7 +406,8 @@ resource "azurerm_monitor_diagnostic_setting" "pe_kv_nic" {
 }
 
 resource "azurerm_key_vault_managed_hardware_security_module" "keyvault_hsm" {
-  count = var.enabled && var.managed_hardware_security_module_enabled ? 1 : 0
+  provider = azurerm.main_sub
+  count    = var.enabled && var.managed_hardware_security_module_enabled ? 1 : 0
 
   name                          = format("%s-hsm-kv", module.labels.id)
   location                      = var.location

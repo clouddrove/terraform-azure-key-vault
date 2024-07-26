@@ -1,5 +1,14 @@
 provider "azurerm" {
   features {}
+  subscription_id            = "01110-12010122022111111c"
+  skip_provider_registration = "true"
+}
+
+provider "azurerm" {
+  features {}
+  alias                      = "peer"
+  subscription_id            = "01110-12010122022111111c" #change this to other subscription if dns hosted in other subscription.
+  skip_provider_registration = "true"
 }
 
 data "azurerm_client_config" "current_client_config" {}
@@ -67,6 +76,11 @@ module "log-analytics" {
 #Key Vault
 module "vault" {
   source = "../.."
+
+  providers = {
+    azurerm.dns_sub  = azurerm.peer, #change this to other alias if dns hosted in other subscription.
+    azurerm.main_sub = azurerm
+  }
 
   name                      = "annkdep"
   environment               = "test"
