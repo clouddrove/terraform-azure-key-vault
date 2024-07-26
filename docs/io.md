@@ -6,7 +6,6 @@
 | addon\_vent\_link | The name of the addon vnet | `bool` | `false` | no |
 | addon\_virtual\_network\_id | The name of the addon vnet link vnet id | `string` | `""` | no |
 | admin\_objects\_ids | IDs of the objects that can do all operations on all keys, secrets and certificates. | `list(string)` | `[]` | no |
-| alias\_sub | Different subscription id for local provider(id of diff sub in which DNS zone is present). | `string` | `null` | no |
 | certificate\_contacts | Contact information to send notifications triggered by certificate lifetime events | <pre>list(object({<br>    email = string<br>    name  = optional(string)<br>    phone = optional(string)<br>  }))</pre> | `[]` | no |
 | diagnostic\_setting\_enable | n/a | `bool` | `false` | no |
 | diff\_sub | Flag to tell whether dns zone is in different sub or not. | `bool` | `false` | no |
