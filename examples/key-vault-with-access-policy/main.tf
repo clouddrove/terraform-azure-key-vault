@@ -1,14 +1,12 @@
 provider "azurerm" {
   features {}
-  subscription_id            = "01110-12010122022111111c"
-  skip_provider_registration = "true"
+  subscription_id = "000000-11111-1223-XXX-XXXXXXXXXXXX"
 }
 
 provider "azurerm" {
   features {}
-  alias                      = "peer"
-  subscription_id            = "01110-12010122022111111c" #change this to other subscription if dns hosted in other subscription.
-  skip_provider_registration = "true"
+  alias           = "peer"
+  subscription_id = "000000-11111-1223-XXX-XXXXXXXXXXXX" #change this to other subscription if dns hosted in other subscription.
 }
 
 data "azurerm_client_config" "current_client_config" {}
@@ -38,7 +36,7 @@ module "vnet" {
 
 module "subnet" {
   source  = "clouddrove/subnet/azure"
-  version = "1.1.0"
+  version = "1.2.1"
 
   name                 = "app"
   environment          = "test"
@@ -46,6 +44,7 @@ module "subnet" {
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
   virtual_network_name = module.vnet.vnet_name
+
 
   #subnet
   subnet_names    = ["subnet1", "subnet2"]
@@ -63,12 +62,13 @@ module "subnet" {
 
 module "log-analytics" {
   source                           = "clouddrove/log-analytics/azure"
-  version                          = "1.0.1"
+  version                          = "1.1.0"
   name                             = "app"
   environment                      = "test"
   label_order                      = ["name", "environment"]
   create_log_analytics_workspace   = true
   log_analytics_workspace_sku      = "PerGB2018"
+  log_analytics_workspace_id       = module.log-analytics.workspace_id
   resource_group_name              = module.resource_group.resource_group_name
   log_analytics_workspace_location = module.resource_group.resource_group_location
 }
