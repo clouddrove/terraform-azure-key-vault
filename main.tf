@@ -1,5 +1,5 @@
 ##-----------------------------------------------------------------------------
-## Data block to query information 
+## Data block to query information
 ##-----------------------------------------------------------------------------
 data "azurerm_client_config" "current_client_config" {}
 
@@ -76,7 +76,7 @@ resource "azurerm_key_vault" "key_vault" {
 
 ##-----------------------------------------------------------------------------
 ## Below resource will provide user access on key vault based on policy based in azure environment.
-## if rbac is enabled then below resource will create. 
+## if rbac is enabled then below resource will create.
 ##-----------------------------------------------------------------------------
 resource "azurerm_key_vault_access_policy" "readers_policy" {
   provider = azurerm.main_sub
@@ -166,7 +166,7 @@ resource "azurerm_key_vault_access_policy" "admin_policy" {
 
 ##-----------------------------------------------------------------------------
 ## Below resource will provide user access on key vault based on role base access in azure environment.
-## if rbac is enabled then below resource will create. 
+## if rbac is enabled then below resource will create.
 ##-----------------------------------------------------------------------------
 resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
   provider = azurerm.main_sub
@@ -220,7 +220,7 @@ resource "azurerm_private_endpoint" "pep" {
   }
 }
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Data block to retreive private ip of private endpoint.
 ##-----------------------------------------------------------------------------
 data "azurerm_private_endpoint_connection" "private-ip" {
@@ -232,9 +232,9 @@ data "azurerm_private_endpoint_connection" "private-ip" {
   depends_on          = [azurerm_key_vault.key_vault]
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will create private dns zone in your azure subscription. 
-## Will be created only when there is no existing private dns zone and private endpoint is enabled. 
+##-----------------------------------------------------------------------------
+## Below resource will create private dns zone in your azure subscription.
+## Will be created only when there is no existing private dns zone and private endpoint is enabled.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone" "dnszone" {
   provider = azurerm.main_sub
@@ -245,9 +245,9 @@ resource "azurerm_private_dns_zone" "dnszone" {
   tags                = module.labels.tags
 }
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Below resource will create vnet link in private dns.
-## Vnet link will be created when there is no existing private dns zone or existing private dns zone is in same subscription.  
+## Vnet link will be created when there is no existing private dns zone or existing private dns zone is in same subscription.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
   provider = azurerm.main_sub
@@ -260,9 +260,9 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link" {
   tags                  = module.labels.tags
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will create vnet link in existing private dns zone. 
-## Vnet link will be created when existing private dns zone is in different subscription. 
+##-----------------------------------------------------------------------------
+## Below resource will create vnet link in existing private dns zone.
+## Vnet link will be created when existing private dns zone is in different subscription.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
   provider = azurerm.dns_sub
@@ -275,10 +275,10 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-1" {
   tags                  = module.labels.tags
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will create vnet link in existing private dns zone. 
-## Vnet link will be created when existing private dns zone is in different subscription. 
-## This resource is deployed when more than 1 vnet link is required and module can be called again to do so without deploying other key vault resources. 
+##-----------------------------------------------------------------------------
+## Below resource will create vnet link in existing private dns zone.
+## Vnet link will be created when existing private dns zone is in different subscription.
+## This resource is deployed when more than 1 vnet link is required and module can be called again to do so without deploying other key vault resources.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
   provider = azurerm.dns_sub
@@ -291,9 +291,9 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vent-link-diff-subs" {
   tags                  = module.labels.tags
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will create vnet link in private dns zone. 
-## Below resource will be created when extra vnet link is required in dns zone in same subscription. 
+##-----------------------------------------------------------------------------
+## Below resource will create vnet link in private dns zone.
+## Below resource will be created when extra vnet link is required in dns zone in same subscription.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
   provider = azurerm.main_sub
@@ -306,8 +306,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
   tags                  = module.labels.tags
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will create dns A record for private ip of private endpoint in private dns zone. 
+##-----------------------------------------------------------------------------
+## Below resource will create dns A record for private ip of private endpoint in private dns zone.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord" {
   provider = azurerm.main_sub
@@ -326,9 +326,9 @@ resource "azurerm_private_dns_a_record" "arecord" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will create dns A record for private ip of private endpoint in private dns zone. 
-## This resource will be created when private dns is in different subscription. 
+##-----------------------------------------------------------------------------
+## Below resource will create dns A record for private ip of private endpoint in private dns zone.
+## This resource will be created when private dns is in different subscription.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_dns_a_record" "arecord-1" {
   provider = azurerm.dns_sub
@@ -348,8 +348,8 @@ resource "azurerm_private_dns_a_record" "arecord-1" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Below resources will create diagnostic setting for key vault and its components. 
+##-----------------------------------------------------------------------------
+## Below resources will create diagnostic setting for key vault and its components.
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "example" {
   provider = azurerm.main_sub
