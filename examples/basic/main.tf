@@ -1,14 +1,12 @@
 provider "azurerm" {
   features {}
-  subscription_id            = "01110-12010122022111111c"
-  skip_provider_registration = "true"
+  subscription_id = "000000-11111-1223-XXX-XXXXXXXXXXXX"
 }
 
 provider "azurerm" {
   features {}
-  alias                      = "peer"
-  subscription_id            = "01110-12010122022111111c" #change this to other subscription if dns hosted in other subscription.
-  skip_provider_registration = "true"
+  alias           = "peer"
+  subscription_id = "000000-11111-1223-XXX-XXXXXXXXXXXX" #change this to other subscription if dns hosted in other subscription.
 }
 
 data "azurerm_client_config" "current_client_config" {}
