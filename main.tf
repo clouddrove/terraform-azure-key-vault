@@ -75,6 +75,16 @@ resource "azurerm_key_vault" "key_vault" {
 }
 
 ##-----------------------------------------------------------------------------
+##Below resource will deploy secrets into the Key-Vault.
+##-----------------------------------------------------------------------------
+resource "azurerm_key_vault_secret" "key_vault_secret" {
+  for_each     = var.secrets
+  key_vault_id = azurerm_key_vault.key_vault[0].id
+  name         = each.key
+  value        = each.value
+
+}
+##-----------------------------------------------------------------------------
 ## Below resource will provide user access on key vault based on policy based in azure environment.
 ## if rbac is enabled then below resource will create. 
 ##-----------------------------------------------------------------------------
