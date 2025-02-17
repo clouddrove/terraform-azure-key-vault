@@ -66,6 +66,18 @@ resource "azurerm_key_vault" "key_vault" {
       phone = contact.value.phone
     }
   }
+  dynamic "access_policy" {
+    for_each = var.use_dynamic_access_policy ? var.access_policies : []
+    content {
+      tenant_id               = data.azurerm_client_config.current_client_config.tenant_id
+      object_id               = access_policy.value.object_id
+      certificate_permissions = access_policy.value.certificate_permissions
+      key_permissions         = access_policy.value.key_permissions
+      secret_permissions      = access_policy.value.secret_permissions
+      storage_permissions     = access_policy.value.storage_permissions
+    }
+  }
+
 
   lifecycle {
     ignore_changes = [
@@ -90,7 +102,7 @@ resource "azurerm_key_vault_secret" "key_vault_secret" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_key_vault_access_policy" "readers_policy" {
   provider = azurerm.main_sub
-  for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? [] : var.reader_objects_ids)
+  for_each = toset(var.use_dynamic_access_policy || var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? [] : var.reader_objects_ids)
 
   object_id    = each.value
   tenant_id    = data.azurerm_client_config.current_client_config.tenant_id
@@ -114,7 +126,7 @@ resource "azurerm_key_vault_access_policy" "readers_policy" {
 
 resource "azurerm_key_vault_access_policy" "admin_policy" {
   provider = azurerm.main_sub
-  for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? [] : var.admin_objects_ids)
+  for_each = toset(var.use_dynamic_access_policy || var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? [] : var.reader_objects_ids)
 
   object_id    = each.value
   tenant_id    = data.azurerm_client_config.current_client_config.tenant_id
