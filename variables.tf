@@ -23,6 +23,13 @@ variable "label_order" {
   description = "Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] ."
 }
 
+variable "secrets" {
+  type        = map(string)
+  description = "Map of secrets to be stored in the Key Vault"
+  default     = {}
+}
+
+
 variable "managedby" {
   type        = string
   default     = ""
