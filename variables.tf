@@ -282,3 +282,15 @@ variable "access_policies" {
   default     = []
   description = "Map of access policies for an object_id (user, service principal, security group) to backend."
 }
+
+variable "keyvault_admin_enabled" {
+  type        = bool
+  default     = false
+  description = "Controls whether to assign Key Vault Administrator (true) or Key Vault Contributor (false) roles to the specified principals."
+}
+
+variable "contributor_objects_ids" {
+  type        = list(string)
+  default     = []
+  description = "List of principal IDs (Object IDs) that will be assigned the Key Vault Contributor role when keyvault_admin_enabled is set to false. These can be User, Group, or Service Principal Object IDs from Azure Active Directory."
+}

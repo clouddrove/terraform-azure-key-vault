@@ -192,7 +192,7 @@ resource "azurerm_key_vault_access_policy" "admin_policy" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
   provider = azurerm.main_sub
-  for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.admin_objects_ids : [])
+  for_each = toset(var.enable_rbac_authorization && var.enabled && var.keyvault_admin_enabled && !var.managed_hardware_security_module_enabled ? var.admin_objects_ids : [])
 
   scope                = azurerm_key_vault.key_vault[0].id
   role_definition_name = "Key Vault Administrator"
@@ -214,6 +214,15 @@ resource "azurerm_role_assignment" "rbac_keyvault_reader" {
 
   scope                = azurerm_key_vault.key_vault[0].id
   role_definition_name = "Key Vault Reader"
+  principal_id         = each.value
+}
+
+resource "azurerm_role_assignment" "rbac_keyvault_contributor" {
+  provider = azurerm.main_sub
+  for_each = toset(var.enable_rbac_authorization && var.enabled && !var.managed_hardware_security_module_enabled ? var.contributor_objects_ids : [])
+
+  scope                = azurerm_key_vault.key_vault[0].id
+  role_definition_name = "Key Vault Contributor"
   principal_id         = each.value
 }
 
