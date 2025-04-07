@@ -155,6 +155,12 @@ variable "existing_private_dns_zone_resource_group_name" {
   description = "The name of the existing resource group"
 }
 
+variable "existing_private_dns_zone_id" {
+  description = "The ID of an existing private DNS zone."
+  type        = string
+  default     = null
+}
+
 variable "public_network_access_enabled" {
   type        = bool
   default     = true
