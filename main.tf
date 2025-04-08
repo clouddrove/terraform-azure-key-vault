@@ -219,7 +219,7 @@ resource "azurerm_private_endpoint" "pep" {
   tags                = module.labels.tags
 
   private_dns_zone_group {
-    name                 = format("%s-sa-dns-zone-group", module.labels.id)
+    name                 = format("%s-kv-dns-zone-group", module.labels.id)
     private_dns_zone_ids = var.existing_private_dns_zone == null ? [azurerm_private_dns_zone.dnszone[0].id] : [var.existing_private_dns_zone_id]
   }
 
@@ -321,48 +321,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
   virtual_network_id    = var.addon_virtual_network_id
   tags                  = module.labels.tags
 }
-
-##----------------------------------------------------------------------------- 
-## Below resource will create dns A record for private ip of private endpoint in private dns zone. 
-##-----------------------------------------------------------------------------
-# resource "azurerm_private_dns_a_record" "arecord" {
-#   provider = azurerm.main_sub
-#   count    = var.enabled && var.enable_private_endpoint && var.diff_sub == false ? 1 : 0
-
-#   name                = azurerm_key_vault.key_vault[0].name
-#   zone_name           = local.private_dns_zone_name
-#   resource_group_name = local.valid_rg_name
-#   ttl                 = 3600
-#   records             = [data.azurerm_private_endpoint_connection.private-ip[0].private_service_connection[0].private_ip_address]
-#   tags                = module.labels.tags
-#   lifecycle {
-#     ignore_changes = [
-#       tags,
-#     ]
-#   }
-# }
-
-##----------------------------------------------------------------------------- 
-## Below resource will create dns A record for private ip of private endpoint in private dns zone. 
-## This resource will be created when private dns is in different subscription. 
-##-----------------------------------------------------------------------------
-# resource "azurerm_private_dns_a_record" "arecord-1" {
-#   provider = azurerm.dns_sub
-#   count    = var.enabled && var.enable_private_endpoint && var.diff_sub == true ? 1 : 0
-
-
-#   name                = azurerm_key_vault.key_vault[0].name
-#   zone_name           = local.private_dns_zone_name
-#   resource_group_name = local.valid_rg_name
-#   ttl                 = 3600
-#   records             = [data.azurerm_private_endpoint_connection.private-ip[0].private_service_connection[0].private_ip_address]
-#   tags                = module.labels.tags
-#   lifecycle {
-#     ignore_changes = [
-#       tags,
-#     ]
-#   }
-# }
 
 ##----------------------------------------------------------------------------- 
 ## Below resources will create diagnostic setting for key vault and its components. 
