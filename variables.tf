@@ -29,6 +29,11 @@ variable "secrets" {
   default     = {}
 }
 
+variable "use_dynamic_access_policy" {
+  description = "If true, use dynamic access policy block within azurerm_key_vault. If false, use separate azurerm_key_vault_access_policy resource."
+  type        = bool
+  default     = false
+}
 
 variable "managedby" {
   type        = string
@@ -270,4 +275,28 @@ variable "network_acls" {
     virtual_network_subnet_ids = optional(list(string)),
   })
   default = {}
+}
+
+variable "access_policies" {
+  type = list(object({
+    object_id               = string,
+    certificate_permissions = list(string),
+    key_permissions         = list(string),
+    secret_permissions      = list(string),
+    storage_permissions     = list(string),
+  }))
+  default     = []
+  description = "Map of access policies for an object_id (user, service principal, security group) to backend."
+}
+
+variable "keyvault_admin_enabled" {
+  type        = bool
+  default     = false
+  description = "Controls whether to assign Key Vault Administrator (true) or Key Vault Contributor (false) roles to the specified principals."
+}
+
+variable "contributor_objects_ids" {
+  type        = list(string)
+  default     = []
+  description = "List of principal IDs (Object IDs) that will be assigned the Key Vault Contributor role when keyvault_admin_enabled is set to false. These can be User, Group, or Service Principal Object IDs from Azure Active Directory."
 }
