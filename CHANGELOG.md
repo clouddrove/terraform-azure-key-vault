@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-08-28
+### :sparkles: New Features
+- [`b3a343c`](https://github.com/clouddrove/terraform-azure-key-vault/commit/b3a343c1a15450d62fe9001c00d5b99068dcdbea) - Added Key-Vault Secret Resource *(PR [#76](https://github.com/clouddrove/terraform-azure-key-vault/pull/76) by [@vedkops](https://github.com/vedkops))*
+
+### :bug: Bug Fixes
+- [`9b2bee4`](https://github.com/clouddrove/terraform-azure-key-vault/commit/9b2bee43f27843cda4175e5f34b560c323de9436) - renamed _examples to examples and referenced it *(PR [#40](https://github.com/clouddrove/terraform-azure-key-vault/pull/40) by [@vjdbj](https://github.com/vjdbj))*
+- [`625e7ea`](https://github.com/clouddrove/terraform-azure-key-vault/commit/625e7ea1e152e2a25d8bcd289b394e6faab964b4) - applied terraform fmt command *(PR [#79](https://github.com/clouddrove/terraform-azure-key-vault/pull/79) by [@rushimohite001](https://github.com/rushimohite001))*
+
+### :memo: Documentation Changes
+- [`9da908a`](https://github.com/clouddrove/terraform-azure-key-vault/commit/9da908aaa0e4db62b72f5dae4f106528d86ebf11) - update CHANGELOG.md for 1.2.0 *(commit by [@clouddrove-ci](https://github.com/clouddrove-ci))*
+
+
 ## [1.2.0] - 2024-07-26
 ### :sparkles: New Features
 - [`173b47d`](https://github.com/clouddrove/terraform-azure-key-vault/commit/173b47d2cbb8c31cc439c25daa9a6ffad7438393) - Added support for extra_tags *(PR [#26](https://github.com/clouddrove/terraform-azure-key-vault/pull/26) by [@Rupalgw](https://github.com/Rupalgw))*
@@ -56,3 +68,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [1.1.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.5...1.1.0
 [1.2.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.1.0...1.2.0
+[1.3.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.2.0...1.3.0
