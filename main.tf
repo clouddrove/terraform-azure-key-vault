@@ -258,18 +258,6 @@ resource "azurerm_private_endpoint" "pep" {
 }
 
 ##----------------------------------------------------------------------------- 
-## Data block to retreive private ip of private endpoint.
-##-----------------------------------------------------------------------------
-data "azurerm_private_endpoint_connection" "private-ip" {
-  provider = azurerm.main_sub
-  count    = var.enabled && var.enable_private_endpoint ? 1 : 0
-
-  name                = azurerm_private_endpoint.pep[0].name
-  resource_group_name = var.resource_group_name
-  depends_on          = [azurerm_key_vault.key_vault]
-}
-
-##----------------------------------------------------------------------------- 
 ## Below resource will create private dns zone in your azure subscription. 
 ## Will be created only when there is no existing private dns zone and private endpoint is enabled. 
 ##-----------------------------------------------------------------------------
