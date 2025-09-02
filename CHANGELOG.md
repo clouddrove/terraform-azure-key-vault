@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2025-09-02
+### :sparkles: New Features
+- [`451d442`](https://github.com/clouddrove/terraform-azure-key-vault/commit/451d4423f30eecfc00435c25993c348cbd332767) - Updated Key Vault   Depreciated Attribute *(PR [#80](https://github.com/clouddrove/terraform-azure-key-vault/pull/80) by [@vedkops](https://github.com/vedkops))*
+
+### :memo: Documentation Changes
+- [`59358da`](https://github.com/clouddrove/terraform-azure-key-vault/commit/59358dae06875c484237dae259f0077848fcd098) - update CHANGELOG.md for 1.3.0 *(commit by [@clouddrove-ci](https://github.com/clouddrove-ci))*
+
+
 ## [1.3.0] - 2025-08-28
 ### :sparkles: New Features
 - [`b3a343c`](https://github.com/clouddrove/terraform-azure-key-vault/commit/b3a343c1a15450d62fe9001c00d5b99068dcdbea) - Added Key-Vault Secret Resource *(PR [#76](https://github.com/clouddrove/terraform-azure-key-vault/pull/76) by [@vedkops](https://github.com/vedkops))*
@@ -69,3 +77,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.1.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.0.5...1.1.0
 [1.2.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.1.0...1.2.0
 [1.3.0]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.2.0...1.3.0
+[1.3.1]: https://github.com/clouddrove/terraform-azure-key-vault/compare/1.3.0...1.3.1
